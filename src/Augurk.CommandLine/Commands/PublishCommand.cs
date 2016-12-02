@@ -6,9 +6,9 @@ using System.Linq;
 using System.Net.Http;
 using Augurk.CommandLine.Options;
 using Augurk.Entities;
-using TechTalk.SpecFlow.Parser;
 using System.ComponentModel.Composition;
 using Augurk.CommandLine.Plumbing;
+using Gherkin;
 
 namespace Augurk.CommandLine.Commands
 {
@@ -47,9 +47,8 @@ namespace Augurk.CommandLine.Commands
 
         private void ExecuteUsingV1Api()
         {
-            // Instantiate a new parser, using the provided language
-            SpecFlowLangParser parser = new SpecFlowLangParser(new CultureInfo(_options.Language ?? "en-US"));
-
+            // Instantiate a new parser
+            Parser parser = new Parser();
             using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
             {
                 // Get the base uri for all further operations
@@ -68,34 +67,31 @@ namespace Augurk.CommandLine.Commands
                 {
                     try
                     {
-                        using (TextReader reader = File.OpenText(featureFile))
+                        // Parse the feature and convert it to the correct format
+                        Feature feature = parser.Parse(featureFile).ConvertToFeature();
+
+                        // Get the uri to which the feature should be published
+                        string targetUri = $"{groupUri}/{feature.Title}";
+
+                        // Publish the feature
+                        var postTask = client.PostAsJsonAsync<Feature>(targetUri, feature);
+                        postTask.Wait();
+
+                        // Process the result
+                        if (postTask.Result.IsSuccessStatusCode)
                         {
-                            // Parse the feature and convert it to the correct format
-                            Feature feature = parser.Parse(reader, featureFile).ConvertToFeature();
+                            Console.WriteLine("Succesfully published feature '{0}' to group {1} for branch {2}.",
+                                                feature.Title,
+                                                _options.GroupName ?? "Default",
+                                                _options.BranchName);
 
-                            // Get the uri to which the feature should be published
-                            string targetUri = $"{groupUri}/{feature.Title}";
-
-                            // Publish the feature
-                            var postTask = client.PostAsJsonAsync<Feature>(targetUri, feature);
-                            postTask.Wait();
-
-                            // Process the result
-                            if (postTask.Result.IsSuccessStatusCode)
-                            {
-                                Console.WriteLine("Succesfully published feature '{0}' to group {1} for branch {2}.",
-                                                  feature.Title,
-                                                  _options.GroupName ?? "Default",
-                                                  _options.BranchName);
-
-                            }
-                            else
-                            {
-                                Console.Error.WriteLine("Publishing feature '{0}' to uri '{1}' resulted in statuscode '{2}'",
-                                                        feature.Title,
-                                                        targetUri,
-                                                        postTask.Result.StatusCode);
-                            }
+                        }
+                        else
+                        {
+                            Console.Error.WriteLine("Publishing feature '{0}' to uri '{1}' resulted in statuscode '{2}'",
+                                                    feature.Title,
+                                                    targetUri,
+                                                    postTask.Result.StatusCode);
                         }
                     }
                     catch (Exception e)
@@ -167,8 +163,7 @@ namespace Augurk.CommandLine.Commands
         private void ExecuteUsingV2Api()
         {
             // Instantiate a new parser, using the provided language
-            SpecFlowLangParser parser = new SpecFlowLangParser(new CultureInfo(_options.Language ?? "en-US"));
-
+            Parser parser = new Parser();
             using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
             {
                 // Get the base uri for all further operations
@@ -180,27 +175,24 @@ namespace Augurk.CommandLine.Commands
                 {
                     try
                     {
-                        using (TextReader reader = File.OpenText(featureFile))
+                        // Parse the feature and convert it to the correct format
+                        Feature feature = parser.Parse(featureFile).ConvertToFeature();
+
+                        // Get the uri to which the feature should be published
+                        string targetUri = $"{groupUri}/{feature.Title}/versions/{_options.Version}/";
+
+                        // Publish the feature
+                        var postTask = client.PostAsJsonAsync<Feature>(targetUri, feature);
+                        postTask.Wait();
+
+                        // Process the result
+                        if (postTask.Result.IsSuccessStatusCode)
                         {
-                            // Parse the feature and convert it to the correct format
-                            Feature feature = parser.Parse(reader, featureFile).ConvertToFeature();
-
-                            // Get the uri to which the feature should be published
-                            string targetUri = $"{groupUri}/{feature.Title}/versions/{_options.Version}/";
-
-                            // Publish the feature
-                            var postTask = client.PostAsJsonAsync<Feature>(targetUri, feature);
-                            postTask.Wait();
-
-                            // Process the result
-                            if (postTask.Result.IsSuccessStatusCode)
-                            {
-                                Console.WriteLine($"Succesfully published feature '{feature.Title}' version '{_options.Version}' for product '{_options.ProductName}' to group '{_options.GroupName}'.");
-                            }
-                            else
-                            {
-                                Console.Error.WriteLine($"Publishing feature '{feature.Title}' version '{_options.Version}' to uri '{targetUri}' resulted in statuscode '{postTask.Result.StatusCode}'");
-                            }
+                            Console.WriteLine($"Succesfully published feature '{feature.Title}' version '{_options.Version}' for product '{_options.ProductName}' to group '{_options.GroupName}'.");
+                        }
+                        else
+                        {
+                            Console.Error.WriteLine($"Publishing feature '{feature.Title}' version '{_options.Version}' to uri '{targetUri}' resulted in statuscode '{postTask.Result.StatusCode}'");
                         }
                     }
                     catch (Exception e)
