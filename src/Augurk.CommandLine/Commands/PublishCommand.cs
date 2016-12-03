@@ -68,7 +68,7 @@ namespace Augurk.CommandLine.Commands
                     try
                     {
                         // Parse the feature and convert it to the correct format
-                        Feature feature = parser.Parse(featureFile).ConvertToFeature();
+                        Feature feature = parser.Parse(featureFile).Feature.ConvertToFeature();
 
                         // Get the uri to which the feature should be published
                         string targetUri = $"{groupUri}/{feature.Title}";
@@ -176,7 +176,7 @@ namespace Augurk.CommandLine.Commands
                     try
                     {
                         // Parse the feature and convert it to the correct format
-                        Feature feature = parser.Parse(featureFile).ConvertToFeature();
+                        Feature feature = parser.Parse(featureFile).Feature.ConvertToFeature();
 
                         // Get the uri to which the feature should be published
                         string targetUri = $"{groupUri}/{feature.Title}/versions/{_options.Version}/";
