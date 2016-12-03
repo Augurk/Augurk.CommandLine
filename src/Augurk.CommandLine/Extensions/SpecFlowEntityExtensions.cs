@@ -63,7 +63,7 @@ namespace Augurk.Entities
                 return new string[0];
             }
 
-            return tags.Select(t => t.Name).ToArray();
+            return tags.Select(t => t.Name.Substring(1)).ToArray();
         }
 
         /// <summary>
