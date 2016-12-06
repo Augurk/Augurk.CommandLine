@@ -20,7 +20,7 @@ using System.Linq;
 using SpecFlow = TechTalk.SpecFlow.Parser.SyntaxElements;
 using Gherkin = TechTalk.SpecFlow.Parser.Gherkin;
 
-namespace Augurk.Entities
+namespace Augurk.CommandLine.Entities
 {
     /// <summary>
     /// Contains extension methods to transform entities from the <see cref="TechTalk.SpecFlow.Parser"/> namespace 

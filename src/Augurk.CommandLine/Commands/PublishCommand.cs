@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using Augurk.CommandLine.Options;
-using Augurk.Entities;
+using Augurk.CommandLine.Entities;
 using TechTalk.SpecFlow.Parser;
 using System.ComponentModel.Composition;
 using Augurk.CommandLine.Plumbing;
