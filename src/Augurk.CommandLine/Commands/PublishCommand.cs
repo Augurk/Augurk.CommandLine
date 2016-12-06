@@ -48,7 +48,6 @@ namespace Augurk.CommandLine.Commands
         private void ExecuteUsingV1Api()
         {
             // Instantiate a new parser
-            Parser parser = new Parser();
             using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
             {
                 // Get the base uri for all further operations
@@ -68,7 +67,7 @@ namespace Augurk.CommandLine.Commands
                     try
                     {
                         // Parse the feature and convert it to the correct format
-                        Feature feature = parser.Parse(featureFile).Feature.ConvertToFeature();
+                        Feature feature = ParseFeatureFile(featureFile);
 
                         // Get the uri to which the feature should be published
                         string targetUri = $"{groupUri}/{feature.Title}";
@@ -163,7 +162,6 @@ namespace Augurk.CommandLine.Commands
         private void ExecuteUsingV2Api()
         {
             // Instantiate a new parser, using the provided language
-            Parser parser = new Parser();
             using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
             {
                 // Get the base uri for all further operations
@@ -176,7 +174,7 @@ namespace Augurk.CommandLine.Commands
                     try
                     {
                         // Parse the feature and convert it to the correct format
-                        Feature feature = parser.Parse(featureFile).Feature.ConvertToFeature();
+                        Feature feature = ParseFeatureFile(featureFile);
 
                         // Get the uri to which the feature should be published
                         string targetUri = $"{groupUri}/{feature.Title}/versions/{_options.Version}/";
@@ -195,11 +193,27 @@ namespace Augurk.CommandLine.Commands
                             Console.Error.WriteLine($"Publishing feature '{feature.Title}' version '{_options.Version}' to uri '{targetUri}' resulted in statuscode '{postTask.Result.StatusCode}'");
                         }
                     }
+                    catch (CompositeParserException e)
+                    {
+                        Console.Error.WriteLine($"Unable to parse feature file '{featureFile}'. Are you missing a language comment or --language option?");
+                    }
                     catch (Exception e)
                     {
                         Console.Error.WriteLine(e.ToString());
                     }
                 }
+            }
+        }
+
+        private Feature ParseFeatureFile(string featureFile)
+        {
+            using (var reader = new StreamReader(featureFile))
+            {
+                var parser = new Parser();
+                var tokenScanner = new TokenScanner(reader);
+                var tokenMatcher = new TokenMatcher(new AugurkDialectProvider(_options.Language));
+                var document = parser.Parse(tokenScanner, tokenMatcher);
+                return document.Feature.ConvertToFeature();
             }
         }
     }
