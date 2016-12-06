@@ -47,10 +47,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Augurk.Entities, Version=2.3.2.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Augurk.Entities.2.3.2\lib\net45\Augurk.Entities.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="CommandLine, Version=1.9.71.2, Culture=neutral, PublicKeyToken=de6f01bd326f8c32, processorArchitecture=MSIL">
       <HintPath>..\packages\CommandLineParser.1.9.71\lib\net45\CommandLine.dll</HintPath>
       <Private>True</Private>
@@ -83,6 +79,14 @@
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\ICommandMetadata.cs" />
     <Compile Include="Commands\PublishCommand.cs" />
+    <Compile Include="Entities\Background.cs" />
+    <Compile Include="Entities\BlockKeyword.cs" />
+    <Compile Include="Entities\ExampleSEt.cs" />
+    <Compile Include="Entities\Feature.cs" />
+    <Compile Include="Entities\Scenario.cs" />
+    <Compile Include="Entities\Step.cs" />
+    <Compile Include="Entities\StepKeyword.cs" />
+    <Compile Include="Entities\Table.cs" />
     <Compile Include="Extensions\CompositionContainerExtensions.cs" />
     <Compile Include="Extensions\SpecFlowEntityExtensions.cs" />
     <Compile Include="Options\DeleteOptions.cs" />

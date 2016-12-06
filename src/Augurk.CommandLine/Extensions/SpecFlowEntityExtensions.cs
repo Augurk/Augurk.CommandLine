@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Augurk.Entities
+namespace Augurk.CommandLine.Entities
 {
     /// <summary>
     /// Contains extension methods to transform entities from the <see cref="Gherkin.Ast"/> namespace 
