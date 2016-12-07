@@ -14,6 +14,7 @@
  limitations under the License.
 */
 
+using Gherkin;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,8 +31,9 @@ namespace Augurk.CommandLine.Entities
         /// Converts the provided <see cref="Gherkin.Ast.Feature"/> instance into a <see cref="Augurk.Entities.Feature"/> instance.
         /// </summary>
         /// <param name="feature">The <see cref="Gherkin.Ast.Feature"/> instance that should be converted.</param>
+        /// <param name="dialect">The <see cref="GherkinDialect"/> that is being used for this feature.</param>
         /// <returns>The converted <see cref="Augurk.Entities.Feature"/> instance.</returns>
-        public static Feature ConvertToFeature(this Gherkin.Ast.Feature feature)
+        public static Feature ConvertToFeature(this Gherkin.Ast.Feature feature, GherkinDialect dialect)
         {
             if (feature == null)
             {
@@ -46,8 +48,8 @@ namespace Augurk.CommandLine.Entities
                 Title = feature.Name,
                 Description = feature.Description,
                 Tags = feature.Tags.ConvertToStrings(),
-                Scenarios = scenarios.Select(scenario => scenario.ConvertToScenario()).ToArray(),
-                Background = background?.ConvertToBackground()
+                Scenarios = scenarios.Select(scenario => scenario.ConvertToScenario(dialect)).ToArray(),
+                Background = background?.ConvertToBackground(dialect)
             };
         }
 
@@ -70,8 +72,9 @@ namespace Augurk.CommandLine.Entities
         /// Converts the provided <see cref="Gherkin.Ast.ScenarioDefinition"/> instance into a <see cref="Augurk.Entities.Scenario"/> instance.
         /// </summary>
         /// <param name="scenarioDefinition">The <see cref="Gherkin.Ast.ScenarioDefinition"/> instance that should be converted.</param>
+        /// <param name="dialect">The <see cref="GherkinDialect"/> that is being used for this feature.</param>
         /// <returns>The converted <see cref="Augurk.Entities.Scenario"/> instance.</returns>
-        public static Scenario ConvertToScenario(this Gherkin.Ast.ScenarioDefinition scenarioDefinition)
+        public static Scenario ConvertToScenario(this Gherkin.Ast.ScenarioDefinition scenarioDefinition, GherkinDialect dialect)
         {
             if (scenarioDefinition == null)
             {
@@ -81,7 +84,7 @@ namespace Augurk.CommandLine.Entities
             Gherkin.Ast.ScenarioOutline outline = scenarioDefinition as Gherkin.Ast.ScenarioOutline;
             if (outline != null)
             {
-                return outline.ConvertToScenario();
+                return outline.ConvertToScenario(dialect);
             }
 
             Gherkin.Ast.Scenario scenario = scenarioDefinition as Gherkin.Ast.Scenario;
@@ -91,7 +94,7 @@ namespace Augurk.CommandLine.Entities
                 Title = scenario.Name,
                 Description = scenario.Description,
                 Tags = scenario.Tags.ConvertToStrings(),
-                Steps = scenario.Steps.ConvertToSteps()
+                Steps = scenario.Steps.ConvertToSteps(dialect)
             };
         }
 
@@ -99,8 +102,9 @@ namespace Augurk.CommandLine.Entities
         /// Converts the provided <see cref=" Gherkin.Ast.ScenarioOutline"/> instance into a <see cref="Augurk.Entities.Scenario"/> instance.
         /// </summary>
         /// <param name="scenarioOutline">The <see cref=" Gherkin.Ast.ScenarioOutline"/> instance that should be converted.</param>
+        /// <param name="dialect">The <see cref="GherkinDialect"/> that is being used for this feature.</param>
         /// <returns>The converted <see cref="Augurk.Entities.Scenario"/> instance.</returns>
-        public static Scenario ConvertToScenario(this Gherkin.Ast.ScenarioOutline scenarioOutline)
+        public static Scenario ConvertToScenario(this Gherkin.Ast.ScenarioOutline scenarioOutline, GherkinDialect dialect)
         {
             if (scenarioOutline == null)
             {
@@ -112,7 +116,7 @@ namespace Augurk.CommandLine.Entities
                     Title = scenarioOutline.Name,
                     Description = scenarioOutline.Description,
                     Tags = scenarioOutline.Tags.ConvertToStrings(),
-                    Steps = scenarioOutline.Steps.ConvertToSteps(),
+                    Steps = scenarioOutline.Steps.ConvertToSteps(dialect),
                     ExampleSets = scenarioOutline.Examples.ConvertToExampleSets()
                 };
         }
@@ -121,8 +125,9 @@ namespace Augurk.CommandLine.Entities
         /// Converts the provided <see cref=" Gherkin.Ast.Background"/> instance into a <see cref="Augurk.Entities.Background"/> instance.
         /// </summary>
         /// <param name="background">The <see cref=" Gherkin.Ast.Background"/> instance that should be converted.</param>
+        /// <param name="dialect">The <see cref="GherkinDialect"/> that is being used for this feature.</param>
         /// <returns>The converted <see cref="Augurk.Entities.Background"/> instance.</returns>
-        public static Background ConvertToBackground(this Gherkin.Ast.Background background)
+        public static Background ConvertToBackground(this Gherkin.Ast.Background background, GherkinDialect dialect)
         {
             if (background == null)
             {
@@ -133,7 +138,7 @@ namespace Augurk.CommandLine.Entities
             {
                 Title = background.Name,
                 Keyword = background.Keyword,
-                Steps = background.Steps.ConvertToSteps()
+                Steps = background.Steps.ConvertToSteps(dialect)
             };
         }
 
@@ -173,29 +178,59 @@ namespace Augurk.CommandLine.Entities
                     Columns = examples.TableHeader.Cells.Select(cell => cell.Value).ToArray(),
                     Rows = examples.TableBody.Select(row => row.Cells.Select(cell => cell.Value).ToArray()).ToArray()
                 };
-        } 
+        }
 
         /// <summary>
         /// Converts the provided <see cref="Gherkin.Ast.Step"/> instances into an enumerable collection of <see cref="Augurk.Entities.Step"/> instances.
         /// </summary>
         /// <param name="steps">The <see cref="Gherkin.Ast.Step"/> instances that should be converted.</param>
+        /// <param name="dialect">The <see cref="GherkinDialect"/> that is being used for this feature.</param>
         /// <returns>An enumerable collection of <see cref="Augurk.Entities.Step"/> instances.</returns>
-        public static IEnumerable<Step> ConvertToSteps(this IEnumerable<Gherkin.Ast.Step> steps)
+        public static IEnumerable<Step> ConvertToSteps(this IEnumerable<Gherkin.Ast.Step> steps, GherkinDialect dialect)
         {
             if (steps == null)
             {
                 return new Step[0];
             }
 
-            return steps.Select(step => step.ConvertToStep()).ToArray();
+            var blockKeyword = BlockKeyword.Given;
+            var result = new List<Step>();
+            foreach (var step in steps)
+            {
+                var convertedStep = step.ConvertToStep(dialect);
+                if (convertedStep.StepKeyword != StepKeyword.And && convertedStep.StepKeyword != StepKeyword.But)
+                {
+                    switch (convertedStep.StepKeyword)
+                    {
+                        case StepKeyword.Given:
+                            blockKeyword = BlockKeyword.Given;
+                            break;
+                        case StepKeyword.When:
+                            blockKeyword = BlockKeyword.When;
+                            break;
+                        case StepKeyword.Then:
+                            blockKeyword = BlockKeyword.Then;
+                            break;
+                        default:
+                            throw new NotSupportedException($"Unexpected step keyword {convertedStep.StepKeyword}.");
+                    }
+                }
+
+                convertedStep.BlockKeyword = blockKeyword;
+                result.Add(convertedStep);
+            }
+
+            return result;
         }
 
         /// <summary>
         /// Converts the provided <see cref="Gherkin.Ast.Step"/> instance into a <see cref="Augurk.Entities.Step"/> instance.
         /// </summary>
         /// <param name="step">The <see cref="Gherkin.Ast.Step"/> instance that should be converted.</param>
+        /// <param name="blockKeyword">Current block of keywords being converted.</param>
+        /// <param name="dialect">The <see cref="GherkinDialect"/> that is being used for this feature.</param>
         /// <returns>The converted <see cref="Augurk.Entities.Step"/> instance.</returns>
-        public static Step ConvertToStep(this Gherkin.Ast.Step step)
+        public static Step ConvertToStep(this Gherkin.Ast.Step step, GherkinDialect dialect)
         {
             if (step == null)
             {
@@ -203,34 +238,45 @@ namespace Augurk.CommandLine.Entities
             }
 
             return new Step()
-                {
-                    BlockKeyword = BlockKeyword.None, // TODO Figure out what this is and where we're using it 
-                    StepKeyword = step.Keyword.ConvertToStepKeyword(),
-                    Keyword = step.Keyword,
-                    Content = step.Text,
-                    TableArgument = step.Argument.ConvertToTable()
-                };
+            {
+                StepKeyword = step.Keyword.ConvertToStepKeyword(dialect),
+                Keyword = step.Keyword,
+                Content = step.Text,
+                TableArgument = step.Argument.ConvertToTable()
+            };
         }
 
         /// <summary>
         /// Converts the provided <see cref="Gherkin.StepKeyword"/> into a <see cref="Augurk.Entities.StepKeyword"/>.
         /// </summary>
         /// <param name="stepKeyword">The <see cref="Gherkin.StepKeyword"/> that should be converted.</param>
+        /// <param name="dialect">The <see cref="GherkinDialect"/> that is being used for this feature.</param>
         /// <returns>The converted <see cref="Augurk.Entities.StepKeyword"/>.</returns>
-        public static StepKeyword ConvertToStepKeyword(this string stepKeyword)
+        public static StepKeyword ConvertToStepKeyword(this string stepKeyword, GherkinDialect dialect)
         {
-            switch (stepKeyword)
+            if (dialect.AndStepKeywords.Contains(stepKeyword))
             {
-                case "Given":
-                    return StepKeyword.Given;
-                case "Then":
-                    return StepKeyword.Then;
-                case "When":
-                    return StepKeyword.When;
-                case "And":
-                    return StepKeyword.And;
-                default:
-                    return StepKeyword.None;
+                return StepKeyword.And;
+            }
+            else if (dialect.ButStepKeywords.Contains(stepKeyword))
+            {
+                return StepKeyword.But;
+            }
+            else if (dialect.GivenStepKeywords.Contains(stepKeyword))
+            {
+                return StepKeyword.Given;
+            }
+            else if (dialect.WhenStepKeywords.Contains(stepKeyword))
+            {
+                return StepKeyword.When;
+            }
+            else if (dialect.ThenStepKeywords.Contains(stepKeyword))
+            {
+                return StepKeyword.Then;
+            }
+            else
+            {
+                return StepKeyword.None;
             }
         }
 

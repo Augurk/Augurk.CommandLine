@@ -210,10 +210,11 @@ namespace Augurk.CommandLine.Commands
             using (var reader = new StreamReader(featureFile))
             {
                 var parser = new Parser();
+                var dialectProvider = new AugurkDialectProvider(_options.Language);
                 var tokenScanner = new TokenScanner(reader);
-                var tokenMatcher = new TokenMatcher(new AugurkDialectProvider(_options.Language));
+                var tokenMatcher = new TokenMatcher(dialectProvider);
                 var document = parser.Parse(tokenScanner, tokenMatcher);
-                return document.Feature.ConvertToFeature();
+                return document.Feature.ConvertToFeature(dialectProvider.GetDialect(document.Feature.Language, document.Feature.Location));
             }
         }
     }
