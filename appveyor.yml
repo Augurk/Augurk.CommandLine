@@ -1,0 +1,5 @@
+version: 2.3.1.{build}
+before_build:
+- cmd: nuget restore src/Augurk.CommandLine.sln
+build:
+  verbosity: minimal

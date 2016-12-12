@@ -1,5 +1,6 @@
 Augurk
 ======
+[![Build status](https://ci.appveyor.com/api/projects/status/elxscd2cr60jkx35/branch/master?svg=true)](https://ci.appveyor.com/project/augurk/augurk-commandline/branch/master)
 
 Augurk is a work-in-progress living documentation system created especially to be used 
 in conjunction with [SpecFlow](http://www.specflow.org) and 
