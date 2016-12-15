@@ -3,11 +3,11 @@ install:
 assembly_info:
   patch: false
 before_build:
-- cmd: nuget restore src/Augurk.CommandLine.sln
+- cmd: nuget restore src\Augurk.CommandLine.sln
 - ps: gitversion /l console /output buildserver /updateAssemblyInfo
 build:
   verbosity: minimal
 after_build:
-  - cmd: ECHO nuget pack src/Augurk.CommandLine/Augurk.CommandLine.nuspec -version "%GitVersion_NuGetVersion%" -prop "target=%CONFIGURATION%"
-  - cmd: nuget pack src/Augurk.CommandLine/Augurk.CommandLine.nuspec -version "%GitVersion_NuGetVersion%" -prop "target=%CONFIGURATION%"
+  - cmd: ECHO nuget pack src\Augurk.CommandLine\Augurk.CommandLine.nuspec -version "%GitVersion_NuGetVersion%" -prop "target=%CONFIGURATION%"
+  - cmd: nuget pack src\Augurk.CommandLine\Augurk.CommandLine.nuspec -version "%GitVersion_NuGetVersion%" -prop "target=%CONFIGURATION%"
   - cmd: appveyor PushArtifact "Augurk.CommandLine.%GitVersion_NuGetVersion%.nupkg"
