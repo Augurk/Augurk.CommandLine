@@ -1,16 +1,13 @@
-version: 2.3.2.{build}
+install:
+- choco install gitversion.portable -pre -y
 assembly_info:
-  patch: true
-  file: '**\AssemblyInfo.*'
-  assembly_version: '{version}'
-  assembly_file_version: '{version}'
-  assembly_informational_version: '{version}'
-pull_requests:
-  do_not_increment_build_number: true
+  patch: false
 before_build:
 - cmd: nuget restore src/Augurk.CommandLine.sln
+- ps: gitversion /l console /output buildserver /updateAssemblyInfo
 build:
-  publish_nuget: true
-  publish_nuget_symbols: false
-  include_nuget_references: true
   verbosity: minimal
+after_build:
+  - cmd: ECHO nuget pack <Project>\<NuSpec>.nuspec -version "%GitVersion_NuGetVersion%" -prop "target=%CONFIGURATION%"
+  - cmd: nuget pack <Project>\<NuSpec>.nuspec -version "%GitVersion_NuGetVersion%" -prop "target=%CONFIGURATION%"
+  - cmd: appveyor PushArtifact "<NuSpec>.%GitVersion_NuGetVersion%.nupkg"
