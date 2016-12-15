@@ -5,6 +5,7 @@ assembly_info:
 before_build:
 - cmd: nuget restore src\Augurk.CommandLine.sln
 - ps: gitversion /l console /output buildserver /updateAssemblyInfo
+configuration: Release
 build:
   verbosity: minimal
 after_build:
