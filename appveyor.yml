@@ -1,5 +1,16 @@
-version: 2.3.1.{build}
+version: 2.3.2.{build}
+assembly_info:
+  patch: true
+  file: '**\AssemblyInfo.*'
+  assembly_version: '{version}'
+  assembly_file_version: '{version}'
+  assembly_informational_version: '{version}'
+pull_requests:
+  do_not_increment_build_number: true
 before_build:
 - cmd: nuget restore src/Augurk.CommandLine.sln
 build:
+  publish_nuget: true
+  publish_nuget_symbols: false
+  include_nuget_references: true
   verbosity: minimal
