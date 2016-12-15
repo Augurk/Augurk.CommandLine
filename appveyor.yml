@@ -9,6 +9,6 @@ build:
   verbosity: minimal
 after_build:
   - cmd: cd src\Augurk.CommandLine
-  - cmd: ECHO nuget pack Augurk.CommandLine.nuspec -version "%GitVersion_NuGetVersion%" -prop "target=%CONFIGURATION%"
-  - cmd: nuget pack Augurk.CommandLine.nuspec -version "%GitVersion_NuGetVersion%" -prop "target=%CONFIGURATION%"
+  - cmd: ECHO nuget pack Augurk.CommandLine.nuspec -version "%GitVersion_NuGetVersion%" -prop "Configuration=%CONFIGURATION%"
+  - cmd: nuget pack Augurk.CommandLine.nuspec -version "%GitVersion_NuGetVersion%" -prop "Configuration=%CONFIGURATION%"
   - cmd: appveyor PushArtifact "Augurk.CommandLine.%GitVersion_NuGetVersion%.nupkg"
