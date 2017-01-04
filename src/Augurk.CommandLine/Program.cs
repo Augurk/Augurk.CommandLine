@@ -23,7 +23,7 @@ namespace Augurk.CommandLine
             // Parse the command line arguments
             int exitCode = 0;
             var options = new GlobalOptions();
-            using (var parser = new Parser(settings => { settings.MutuallyExclusive = true; settings.HelpWriter = Console.Error; }))
+            using (var parser = new Parser(settings => { settings.IgnoreUnknownArguments = true; settings.MutuallyExclusive = true; settings.HelpWriter = Console.Error; }))
             {
                 if (!parser.ParseArguments(args, options, ExecuteVerb))
                 {
