@@ -58,6 +58,7 @@
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
       <Private>True</Private>
@@ -100,6 +101,7 @@
     <Compile Include="Entities\StepKeyword.cs" />
     <Compile Include="Entities\Table.cs" />
     <Compile Include="Extensions\CompositionContainerExtensions.cs" />
+    <Compile Include="Extensions\MarkdownExtensions.cs" />
     <Compile Include="Extensions\SpecFlowEntityExtensions.cs" />
     <Compile Include="Options\DeleteOptions.cs" />
     <Compile Include="Options\GlobalOptions.cs" />

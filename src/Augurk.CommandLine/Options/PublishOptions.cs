@@ -58,5 +58,11 @@ namespace Augurk.CommandLine.Options
         /// </summary>
         [Option("language", HelpText = "Language in which the features files have been written. For example: `en-US` or `nl-NL`.", DefaultValue = "en-US", Required = false)]
         public string Language { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether local imaages should be embedded in the feature.
+        /// </summary>
+        [Option("embed", HelpText = "If set any image references to local files will be replaced by an embedded instance of that image.")]
+        public bool Embed { get; set; }
     }
 }
