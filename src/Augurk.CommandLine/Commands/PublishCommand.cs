@@ -196,6 +196,16 @@ namespace Augurk.CommandLine.Commands
                             // Parse the feature and convert it to the correct format
                             Feature feature = parser.Parse(reader, featureFile).ConvertToFeature();
 
+                            // If required, embed the local images into the feature
+                            if (_options.Embed)
+                            {
+                                feature.Description = feature.Description.EmbedImages();
+                                foreach (var scenario in feature.Scenarios)
+                                {
+                                    scenario.Description = scenario.Description.EmbedImages();
+                                }
+                            }
+
                             // Get the uri to which the feature should be published
                             string targetUri = $"{groupUri}/{feature.Title}/versions/{_options.Version}/";
 
