@@ -5,6 +5,14 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Augurk.CommandLine", "Augurk.CommandLine\Augurk.CommandLine.csproj", "{3D0E1E13-76C3-4CB7-B864-0F3D93672144}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F906F5D3-BF38-45D1-9510-C422597C5D08}"
+	ProjectSection(SolutionItems) = preProject
+		..\appveyor.yml = ..\appveyor.yml
+		..\GitVersion.yml = ..\GitVersion.yml
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Augurk.CommandLine.UnitTest", "Augurk.CommandLine.UnitTest\Augurk.CommandLine.UnitTest.csproj", "{2D5857CB-96F4-423A-9644-C79172792EB9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +23,10 @@ Global
 		{3D0E1E13-76C3-4CB7-B864-0F3D93672144}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D0E1E13-76C3-4CB7-B864-0F3D93672144}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D0E1E13-76C3-4CB7-B864-0F3D93672144}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D5857CB-96F4-423A-9644-C79172792EB9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D5857CB-96F4-423A-9644-C79172792EB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D5857CB-96F4-423A-9644-C79172792EB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D5857CB-96F4-423A-9644-C79172792EB9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
