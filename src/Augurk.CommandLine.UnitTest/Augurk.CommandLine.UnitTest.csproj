@@ -60,7 +60,6 @@
       <Name>Augurk.CommandLine</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Content Include="TestData\Image1.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
