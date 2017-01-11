@@ -69,6 +69,8 @@ namespace Augurk.CommandLine.Commands
                 {
                     try
                     {
+                        Directory.SetCurrentDirectory(Path.GetDirectoryName(featureFile));
+
                         using (TextReader reader = File.OpenText(featureFile))
                         {
                             // Parse the feature and convert it to the correct format
@@ -191,6 +193,8 @@ namespace Augurk.CommandLine.Commands
                 {
                     try
                     {
+                        Directory.SetCurrentDirectory(Path.GetDirectoryName(featureFile));
+                        
                         using (TextReader reader = File.OpenText(featureFile))
                         {
                             // Parse the feature and convert it to the correct format
