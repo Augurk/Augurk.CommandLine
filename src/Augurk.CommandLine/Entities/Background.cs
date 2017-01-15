@@ -33,10 +33,14 @@ namespace Augurk.CommandLine.Entities
         /// </summary>
         public string Keyword { get; set; }
 
-
         /// <summary>
         /// Gets or sets the steps of this background.
         /// </summary>
         public IEnumerable<Step> Steps { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="SourceLocation"/> for this background.
+        /// </summary>
+        public SourceLocation Location { get; set; }
     }
 }

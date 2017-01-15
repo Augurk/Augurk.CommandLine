@@ -232,6 +232,7 @@ namespace Augurk.CommandLine.Commands
                 var tokenMatcher = new TokenMatcher(dialectProvider);
                 var document = parser.Parse(tokenScanner, tokenMatcher);
                 var feature = document.Feature.ConvertToFeature(dialectProvider.GetDialect(document.Feature.Language, document.Feature.Location));
+                feature.SourceFilename = featureFile;
 
                 // If compatibility level is set to 2 we need to trim the start of each line in the feature and scenario descriptions
                 if (_options.CompatibilityLevel <= 2)

@@ -14,28 +14,21 @@
  limitations under the License.
 */
 
-using System.Collections.Generic;
-
 namespace Augurk.CommandLine.Entities
 {
     /// <summary>
-    /// Represents a table
+    /// Represents the source location that identifies where it was defined.
     /// </summary>
-    public class Table
+    public class SourceLocation
     {
         /// <summary>
-        /// Gets or sets the columns for this table.
+        /// Gets or sets the column index for this source location.
         /// </summary>
-        public IEnumerable<string> Columns { get; set; }
+        public int Column { get; set; }
 
         /// <summary>
-        /// Gets or sets the rows for this table.
+        /// Gets or sets the line number for this source location.
         /// </summary>
-        public IEnumerable<IEnumerable<string>> Rows { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="SourceLocation"/> for this table.
-        /// </summary>
-        public SourceLocation Location { get; set; }
+        public int Line { get; set; }
     }
 }

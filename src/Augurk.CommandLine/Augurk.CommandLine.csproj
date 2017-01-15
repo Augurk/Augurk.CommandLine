@@ -85,6 +85,7 @@
     <Compile Include="Entities\ExampleSet.cs" />
     <Compile Include="Entities\Feature.cs" />
     <Compile Include="Entities\Scenario.cs" />
+    <Compile Include="Entities\SourceLocation.cs" />
     <Compile Include="Entities\Step.cs" />
     <Compile Include="Entities\StepKeyword.cs" />
     <Compile Include="Entities\Table.cs" />

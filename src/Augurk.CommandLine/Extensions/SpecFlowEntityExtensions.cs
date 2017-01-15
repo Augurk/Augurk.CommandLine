@@ -49,8 +49,24 @@ namespace Augurk.CommandLine.Entities
                 Description = feature.Description,
                 Tags = feature.Tags.ConvertToStrings(),
                 Scenarios = scenarios.Select(scenario => scenario.ConvertToScenario(dialect)).ToArray(),
-                Background = background?.ConvertToBackground(dialect)
+                Background = background?.ConvertToBackground(dialect),
+                Location = feature.Location.ConvertToSourceLocation()
             };
+        }
+
+        /// <summary>
+        /// Converts the provided <see cref="Gherkin.Ast.Location"/> instance into a <see cref="SourceLocation"/> instance.
+        /// </summary>
+        /// <param name="location">The <see cref="Gherkin.Ast.Location"/> instance that should be converted.</param>
+        /// <returns>A <see cref="SourceLocation"/> instance containing the necessary data from the provided <paramref name="location"/>.</returns>
+        public static SourceLocation ConvertToSourceLocation(this Gherkin.Ast.Location location)
+        {
+            if (location == null)
+            {
+                return null;
+            }
+
+            return new SourceLocation { Column = location.Column, Line = location.Line };
         }
 
         /// <summary>
@@ -94,7 +110,8 @@ namespace Augurk.CommandLine.Entities
                 Title = scenario.Name,
                 Description = scenario.Description,
                 Tags = scenario.Tags.ConvertToStrings(),
-                Steps = scenario.Steps.ConvertToSteps(dialect)
+                Steps = scenario.Steps.ConvertToSteps(dialect),
+                Location = scenario.Location.ConvertToSourceLocation()
             };
         }
 
@@ -112,13 +129,14 @@ namespace Augurk.CommandLine.Entities
             }
 
             return new Scenario()
-                {
-                    Title = scenarioOutline.Name,
-                    Description = scenarioOutline.Description,
-                    Tags = scenarioOutline.Tags.ConvertToStrings(),
-                    Steps = scenarioOutline.Steps.ConvertToSteps(dialect),
-                    ExampleSets = scenarioOutline.Examples.ConvertToExampleSets()
-                };
+            {
+                Title = scenarioOutline.Name,
+                Description = scenarioOutline.Description,
+                Tags = scenarioOutline.Tags.ConvertToStrings(),
+                Steps = scenarioOutline.Steps.ConvertToSteps(dialect),
+                ExampleSets = scenarioOutline.Examples.ConvertToExampleSets(),
+                Location = scenarioOutline.Location.ConvertToSourceLocation()
+            };
         }
 
         /// <summary>
@@ -138,7 +156,8 @@ namespace Augurk.CommandLine.Entities
             {
                 Title = background.Name,
                 Keyword = background.Keyword,
-                Steps = background.Steps.ConvertToSteps(dialect)
+                Steps = background.Steps.ConvertToSteps(dialect),
+                Location = background.Location.ConvertToSourceLocation()
             };
         }
 
@@ -170,14 +189,15 @@ namespace Augurk.CommandLine.Entities
             }
 
             return new ExampleSet()
-                {
-                    Title = examples.Name,
-                    Description = examples.Description,
-                    Keyword = examples.Keyword,
-                    Tags = examples.Tags.ConvertToStrings(),
-                    Columns = examples.TableHeader.Cells.Select(cell => cell.Value).ToArray(),
-                    Rows = examples.TableBody.Select(row => row.Cells.Select(cell => cell.Value).ToArray()).ToArray()
-                };
+            {
+                Title = examples.Name,
+                Description = examples.Description,
+                Keyword = examples.Keyword,
+                Tags = examples.Tags.ConvertToStrings(),
+                Columns = examples.TableHeader.Cells.Select(cell => cell.Value).ToArray(),
+                Rows = examples.TableBody.Select(row => row.Cells.Select(cell => cell.Value).ToArray()).ToArray(),
+                Location = examples.Location.ConvertToSourceLocation()
+            };
         }
 
         /// <summary>
@@ -242,7 +262,8 @@ namespace Augurk.CommandLine.Entities
                 StepKeyword = step.Keyword.ConvertToStepKeyword(dialect),
                 Keyword = step.Keyword,
                 Content = step.Text,
-                TableArgument = step.Argument.ConvertToTable()
+                TableArgument = step.Argument.ConvertToTable(),
+                Location = step.Location.ConvertToSourceLocation()
             };
         }
 
@@ -296,7 +317,8 @@ namespace Augurk.CommandLine.Entities
             return new Table
             {
                 Columns = table.Rows.FirstOrDefault()?.Cells.Select(cell => cell.Value).ToArray(),
-                Rows = table.Rows.Skip(1).Select(row => row.Cells.Select(cell => cell.Value).ToArray()).ToArray()
+                Rows = table.Rows.Skip(1).Select(row => row.Cells.Select(cell => cell.Value).ToArray()).ToArray(),
+                Location = table.Location.ConvertToSourceLocation()
             };
         }
     }
