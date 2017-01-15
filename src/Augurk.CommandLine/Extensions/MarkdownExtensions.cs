@@ -19,6 +19,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Augurk.CommandLine.Extensions
@@ -78,6 +79,32 @@ namespace Augurk.CommandLine.Extensions
             }
 
             return resultMarkdown;
+        }
+
+        /// <summary>
+        /// Trims the start of each line in the provided <paramref name="sourceMarkdown"/>.
+        /// </summary>
+        /// <param name="sourceMarkdown">Markdown to trim the start of each line for.</param>
+        /// <returns>Returns the source markdown where the start of each line is trimmed.</returns>
+        public static string TrimLineStart(this string sourceMarkdown)
+        {
+            string[] lines = sourceMarkdown.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
+
+            StringBuilder result = new StringBuilder();
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string line = lines[i];
+                if (i != lines.Length - 1)
+                {
+                    result.AppendLine(line.TrimStart());
+                }
+                else
+                {
+                    result.Append(line.TrimStart());
+                }
+            }
+
+            return result.ToString();
         }
     }
 }

@@ -233,6 +233,16 @@ namespace Augurk.CommandLine.Commands
                 var document = parser.Parse(tokenScanner, tokenMatcher);
                 var feature = document.Feature.ConvertToFeature(dialectProvider.GetDialect(document.Feature.Language, document.Feature.Location));
 
+                // If compatibility level is set to 2 we need to trim the start of each line in the feature and scenario descriptions
+                if (_options.CompatibilityLevel <= 2)
+                {
+                    feature.Description = feature.Description.TrimLineStart();
+                    foreach (var scenario in feature.Scenarios)
+                    {
+                        scenario.Description = scenario.Description.TrimLineStart();
+                    }
+                }
+
                 // If required, embed the local images into the feature
                 if (_options.Embed)
                 {

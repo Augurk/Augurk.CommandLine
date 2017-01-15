@@ -52,5 +52,11 @@ namespace Augurk.CommandLine.Options
         /// </summary>
         [Option("password", HelpText = "Password for basic authentication against the Augurk API's.", Required = false)]
         public string BasicAuthenticationPassword { get; set; }
+
+        /// <summary>
+        /// Compatibility level used while publishing features.
+        /// </summary>
+        [Option("compat-level", HelpText = "Sets the compatibility level. Currently available levels are: 2", Required = false)]
+        public int? CompatibilityLevel { get; set; }
     }
 }

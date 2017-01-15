@@ -23,6 +23,8 @@ namespace Augurk.CommandLine.UnitTest
     [TestClass]
     public class MarkdownExtenionsTests
     {
+        #region EmbedImages
+
         [TestMethod]
         [DeploymentItem(@"TestData\Image1.png")]
         public void EmbedSingleImage()
@@ -113,6 +115,40 @@ namespace Augurk.CommandLine.UnitTest
             // As nothing should happen, compare it against the input
             Assert.AreEqual(inputMarkdown, actualMarkdown);
         }
+
+        #endregion
+
+        #region TrimLineStart
+
+        [TestMethod]
+        public void TrimLineStart()
+        {
+            // Arrange
+            string inputMarkdown = "\tThis feature describes how trimming works" + Environment.NewLine + "\tFor every line in this piece of markdown the start should be trimmed.  ";
+            string expectedMarkdown = "This feature describes how trimming works" + Environment.NewLine + "For every line in this piece of markdown the start should be trimmed.  ";
+
+            // Act
+            string actualMarkdown = inputMarkdown.TrimLineStart();
+
+            // Assert
+            Assert.AreEqual(expectedMarkdown, actualMarkdown);
+        }
+
+        [TestMethod]
+        public void TrimLineStartWithFinalNewLine()
+        {
+            // Arrange
+            string inputMarkdown = "\tThis feature describes how trimming works" + Environment.NewLine + "\tFor every line in this piece of markdown the start should be trimmed.  " + Environment.NewLine;
+            string expectedMarkdown = "This feature describes how trimming works" + Environment.NewLine + "For every line in this piece of markdown the start should be trimmed.  " + Environment.NewLine;
+
+            // Act
+            string actualMarkdown = inputMarkdown.TrimLineStart();
+
+            // Assert
+            Assert.AreEqual(expectedMarkdown, actualMarkdown);
+        }
+
+        #endregion
     }
 }
 
