@@ -64,7 +64,7 @@ namespace Augurk.CommandLine.Commands
 
         private void ExecuteUsingV1Api()
         {
-            // Instantiate a new parser
+            // Create the HttpClient that will communicate with the API
             using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
             {
                 // Get the base uri for all further operations
@@ -109,6 +109,10 @@ namespace Augurk.CommandLine.Commands
                                                     targetUri,
                                                     postTask.Result.StatusCode);
                         }
+                    }
+                    catch (CompositeParserException e)
+                    {
+                        Console.Error.WriteLine($"Unable to parse feature file '{featureFile}'. Are you missing a language comment or --language option?");
                     }
                     catch (Exception e)
                     {
@@ -178,7 +182,7 @@ namespace Augurk.CommandLine.Commands
 
         private void ExecuteUsingV2Api()
         {
-            // Instantiate a new parser, using the provided language
+            // Create the HttpClient that will communicate with the API
             using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
             {
                 // Get the base uri for all further operations

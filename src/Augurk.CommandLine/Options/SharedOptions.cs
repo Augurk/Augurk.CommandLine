@@ -56,7 +56,7 @@ namespace Augurk.CommandLine.Options
         /// <summary>
         /// Compatibility level used while publishing features.
         /// </summary>
-        [Option("compat-level", HelpText = "Sets the compatibility level. Currently available levels are: 2", Required = false)]
+        [Option("compat-level", HelpText = "Sets the compatibility level. Currently available levels are: 2, 3", Required = false, DefaultValue = 3)]
         public int? CompatibilityLevel { get; set; }
     }
 }

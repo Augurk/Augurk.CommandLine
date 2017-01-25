@@ -12,8 +12,9 @@
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>Command line tools for publishing feature files to Augurk.</description>
 		<releaseNotes>
-      Fixes an issue that occurs when a version is not specified while publishing feature files to Augurk.
-      A version number of 0.0.0 is now implied if no version number is specified.
+      This version integrates the new Gherkin parser instead of relying on the old SpecFlow specific parser. This makes
+      the total package a lot smaller as well. Due to some subtle differences in parsing, there is now a --compat-level flag
+      that can be set to 2 (or lower) if necessary.
     </releaseNotes>
 		<copyright>Copyright 2015-2017</copyright>
 		<tags>augurk gherkin specflow cucumber commandline</tags>
