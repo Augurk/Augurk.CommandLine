@@ -214,7 +214,7 @@ namespace Augurk.CommandLine.Entities
                 return new Step[0];
             }
 
-            var blockKeyword = BlockKeyword.Given;
+            BlockKeyword? blockKeyword = null;
             var result = new List<Step>();
             foreach (var step in steps)
             {
@@ -237,7 +237,12 @@ namespace Augurk.CommandLine.Entities
                     }
                 }
 
-                convertedStep.BlockKeyword = blockKeyword;
+                if (blockKeyword == null)
+                {
+                    throw new NotSupportedException($"Detected incorrect use of Gherkin syntax. Scenario cannot start with And or But ('{step.Keyword}').");
+                }
+
+                convertedStep.BlockKeyword = blockKeyword.Value;
                 result.Add(convertedStep);
             }
 
