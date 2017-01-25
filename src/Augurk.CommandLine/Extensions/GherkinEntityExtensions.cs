@@ -81,6 +81,7 @@ namespace Augurk.CommandLine.Entities
                 return new string[0];
             }
 
+            // Strip the @ from the tagname (as it is provided now by the parser)
             return tags.Select(t => t.Name.Substring(1)).ToArray();
         }
 
@@ -317,6 +318,7 @@ namespace Augurk.CommandLine.Entities
             return new Table
             {
                 Columns = table.Rows.FirstOrDefault()?.Cells.Select(cell => cell.Value).ToArray(),
+                // Skip the first row as those are the headers
                 Rows = table.Rows.Skip(1).Select(row => row.Cells.Select(cell => cell.Value).ToArray()).ToArray(),
                 Location = table.Location.ConvertToSourceLocation()
             };
