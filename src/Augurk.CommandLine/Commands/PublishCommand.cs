@@ -238,30 +238,32 @@ namespace Augurk.CommandLine.Commands
                 var feature = document.Feature.ConvertToFeature(dialectProvider.GetDialect(document.Feature.Language, document.Feature.Location));
                 feature.SourceFilename = featureFile;
 
-                // If compatibility level is set to 2 we need to trim the start of each line in the feature and scenario descriptions
-                if (_options.CompatibilityLevel <= 2)
-                {
-                    feature.Description = feature.Description.TrimLineStart();
-                    foreach (var scenario in feature.Scenarios)
-                    {
-                        scenario.Description = scenario.Description.TrimLineStart();
-                    }
-                }
+                Directory.SetCurrentDirectory(Path.GetDirectoryName(featureFile));
 
-                // If required, embed the local images into the feature
-                if (_options.Embed)
+                feature.Description = ProcessDescription(feature.Description);
+                foreach (var scenario in feature.Scenarios)
                 {
-                    Directory.SetCurrentDirectory(Path.GetDirectoryName(featureFile));
-
-                    feature.Description = feature.Description.EmbedImages();
-                    foreach (var scenario in feature.Scenarios)
-                    {
-                        scenario.Description = scenario.Description.EmbedImages();
-                    }
+                    scenario.Description = ProcessDescription(scenario.Description);
                 }
 
                 return feature;
             }
+        }
+
+        private string ProcessDescription(string originalDescription)
+        {
+            string result = originalDescription;
+            if (_options.CompatibilityLevel <= 2)
+            {
+                result = result.TrimLineStart();
+            }
+
+            if (_options.Embed)
+            {
+                result = result.EmbedImages();
+            }
+
+            return result;
         }
     }
 }
