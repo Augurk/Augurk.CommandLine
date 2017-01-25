@@ -47,5 +47,10 @@ namespace Augurk.CommandLine.Entities
         /// Gets or sets the example sets for this scenario.
         /// </summary>
         public IEnumerable<ExampleSet> ExampleSets { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="SourceLocation"/> for this scenario.
+        /// </summary>
+        public SourceLocation Location { get; set; }
     }
 }

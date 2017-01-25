@@ -47,5 +47,15 @@ namespace Augurk.CommandLine.Entities
         /// Gets or sets the background of this feature.
         /// </summary>
         public Background Background { get; set; }
+
+        /// <summary>
+        /// Gets or sets the filename of the source file that contains this feature.
+        /// </summary>
+        public string SourceFilename { get; set; }
+
+        /// <summary>
+        /// Gets or sets a <see cref="SourceLocation"/> that identifies where the feature is defined in the <see cref="SourceFilename"/>.
+        /// </summary>
+        public SourceLocation Location { get; set; }
     }
 }

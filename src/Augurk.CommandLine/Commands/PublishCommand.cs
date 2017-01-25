@@ -22,10 +22,10 @@ using System.Linq;
 using System.Net.Http;
 using Augurk.CommandLine.Options;
 using Augurk.CommandLine.Entities;
-using TechTalk.SpecFlow.Parser;
 using System.ComponentModel.Composition;
 using Augurk.CommandLine.Extensions;
 using Augurk.CommandLine.Plumbing;
+using Gherkin;
 
 namespace Augurk.CommandLine.Commands
 {
@@ -64,9 +64,7 @@ namespace Augurk.CommandLine.Commands
 
         private void ExecuteUsingV1Api()
         {
-            // Instantiate a new parser, using the provided language
-            SpecFlowLangParser parser = new SpecFlowLangParser(new CultureInfo(_options.Language ?? "en-US"));
-
+            // Create the HttpClient that will communicate with the API
             using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
             {
                 // Get the base uri for all further operations
@@ -85,47 +83,36 @@ namespace Augurk.CommandLine.Commands
                 {
                     try
                     {
-                        Directory.SetCurrentDirectory(Path.GetDirectoryName(featureFile));
+                        // Parse the feature and convert it to the correct format
+                        Feature feature = ParseFeatureFile(featureFile);
 
-                        using (TextReader reader = File.OpenText(featureFile))
+                        // Get the uri to which the feature should be published
+                        string targetUri = $"{groupUri}/{feature.Title}";
+
+                        // Publish the feature
+                        var postTask = client.PostAsJsonAsync<Feature>(targetUri, feature);
+                        postTask.Wait();
+
+                        // Process the result
+                        if (postTask.Result.IsSuccessStatusCode)
                         {
-                            // Parse the feature and convert it to the correct format
-                            Feature feature = parser.Parse(reader, featureFile).ConvertToFeature();
+                            Console.WriteLine("Succesfully published feature '{0}' to group {1} for branch {2}.",
+                                                feature.Title,
+                                                _options.GroupName ?? "Default",
+                                                _options.BranchName);
 
-                            // If required, embed the local images into the feature
-                            if (_options.Embed)
-                            {
-                                feature.Description = feature.Description.EmbedImages();
-                                foreach (var scenario in feature.Scenarios)
-                                {
-                                    scenario.Description = scenario.Description.EmbedImages();
-                                }
-                            }
-
-                            // Get the uri to which the feature should be published
-                            string targetUri = $"{groupUri}/{feature.Title}";
-
-                            // Publish the feature
-                            var postTask = client.PostAsJsonAsync<Feature>(targetUri, feature);
-                            postTask.Wait();
-
-                            // Process the result
-                            if (postTask.Result.IsSuccessStatusCode)
-                            {
-                                Console.WriteLine("Succesfully published feature '{0}' to group {1} for branch {2}.",
-                                                  feature.Title,
-                                                  _options.GroupName ?? "Default",
-                                                  _options.BranchName);
-
-                            }
-                            else
-                            {
-                                Console.Error.WriteLine("Publishing feature '{0}' to uri '{1}' resulted in statuscode '{2}'",
-                                                        feature.Title,
-                                                        targetUri,
-                                                        postTask.Result.StatusCode);
-                            }
                         }
+                        else
+                        {
+                            Console.Error.WriteLine("Publishing feature '{0}' to uri '{1}' resulted in statuscode '{2}'",
+                                                    feature.Title,
+                                                    targetUri,
+                                                    postTask.Result.StatusCode);
+                        }
+                    }
+                    catch (CompositeParserException e)
+                    {
+                        Console.Error.WriteLine($"Unable to parse feature file '{featureFile}'. Are you missing a language comment or --language option?");
                     }
                     catch (Exception e)
                     {
@@ -195,9 +182,7 @@ namespace Augurk.CommandLine.Commands
 
         private void ExecuteUsingV2Api()
         {
-            // Instantiate a new parser, using the provided language
-            SpecFlowLangParser parser = new SpecFlowLangParser(new CultureInfo(_options.Language ?? "en-US"));
-
+            // Create the HttpClient that will communicate with the API
             using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
             {
                 // Get the base uri for all further operations
@@ -209,40 +194,29 @@ namespace Augurk.CommandLine.Commands
                 {
                     try
                     {
-                        Directory.SetCurrentDirectory(Path.GetDirectoryName(featureFile));
-                        
-                        using (TextReader reader = File.OpenText(featureFile))
+                        // Parse the feature and convert it to the correct format
+                        Feature feature = ParseFeatureFile(featureFile);
+
+                        // Get the uri to which the feature should be published
+                        string targetUri = $"{groupUri}/{feature.Title}/versions/{_options.Version}/";
+
+                        // Publish the feature
+                        var postTask = client.PostAsJsonAsync<Feature>(targetUri, feature);
+                        postTask.Wait();
+
+                        // Process the result
+                        if (postTask.Result.IsSuccessStatusCode)
                         {
-                            // Parse the feature and convert it to the correct format
-                            Feature feature = parser.Parse(reader, featureFile).ConvertToFeature();
-
-                            // If required, embed the local images into the feature
-                            if (_options.Embed)
-                            {
-                                feature.Description = feature.Description.EmbedImages();
-                                foreach (var scenario in feature.Scenarios)
-                                {
-                                    scenario.Description = scenario.Description.EmbedImages();
-                                }
-                            }
-
-                            // Get the uri to which the feature should be published
-                            string targetUri = $"{groupUri}/{feature.Title}/versions/{_options.Version}/";
-
-                            // Publish the feature
-                            var postTask = client.PostAsJsonAsync<Feature>(targetUri, feature);
-                            postTask.Wait();
-
-                            // Process the result
-                            if (postTask.Result.IsSuccessStatusCode)
-                            {
-                                Console.WriteLine($"Succesfully published feature '{feature.Title}' version '{_options.Version}' for product '{_options.ProductName}' to group '{_options.GroupName}'.");
-                            }
-                            else
-                            {
-                                Console.Error.WriteLine($"Publishing feature '{feature.Title}' version '{_options.Version}' to uri '{targetUri}' resulted in statuscode '{postTask.Result.StatusCode}'");
-                            }
+                            Console.WriteLine($"Succesfully published feature '{feature.Title}' version '{_options.Version}' for product '{_options.ProductName}' to group '{_options.GroupName}'.");
                         }
+                        else
+                        {
+                            Console.Error.WriteLine($"Publishing feature '{feature.Title}' version '{_options.Version}' to uri '{targetUri}' resulted in statuscode '{postTask.Result.StatusCode}'");
+                        }
+                    }
+                    catch (CompositeParserException e)
+                    {
+                        Console.Error.WriteLine($"Unable to parse feature file '{featureFile}'. Are you missing a language comment or --language option?");
                     }
                     catch (Exception e)
                     {
@@ -250,6 +224,46 @@ namespace Augurk.CommandLine.Commands
                     }
                 }
             }
+        }
+
+        private Feature ParseFeatureFile(string featureFile)
+        {
+            using (var reader = new StreamReader(featureFile))
+            {
+                var parser = new Parser();
+                var dialectProvider = new AugurkDialectProvider(_options.Language);
+                var tokenScanner = new TokenScanner(reader);
+                var tokenMatcher = new TokenMatcher(dialectProvider);
+                var document = parser.Parse(tokenScanner, tokenMatcher);
+                var feature = document.Feature.ConvertToFeature(dialectProvider.GetDialect(document.Feature.Language, document.Feature.Location));
+                feature.SourceFilename = featureFile;
+
+                Directory.SetCurrentDirectory(Path.GetDirectoryName(featureFile));
+
+                feature.Description = ProcessDescription(feature.Description);
+                foreach (var scenario in feature.Scenarios)
+                {
+                    scenario.Description = ProcessDescription(scenario.Description);
+                }
+
+                return feature;
+            }
+        }
+
+        private string ProcessDescription(string originalDescription)
+        {
+            string result = originalDescription;
+            if (_options.CompatibilityLevel <= 2)
+            {
+                result = result.TrimLineStart();
+            }
+
+            if (_options.Embed)
+            {
+                result = result.EmbedImages();
+            }
+
+            return result;
         }
     }
 }

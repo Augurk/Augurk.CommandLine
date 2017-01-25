@@ -6,17 +6,19 @@
 		<title>Augurk.CommandLine</title>
 		<authors>Jonathan Mezach, Mark Taling</authors>
 		<owners>Mark Taling</owners>
-		<licenseUrl>https://marktaling.github.io/Augurk/License.md</licenseUrl>
-		<projectUrl>https://github.com/marktaling/Augurk</projectUrl>
-		<iconUrl>https://marktaling.github.io/Augurk/img/icon128.png</iconUrl>
+		<licenseUrl>https://augurk.github.io/Augurk/License.md</licenseUrl>
+		<projectUrl>https://augurk.github.io/</projectUrl>
+		<iconUrl>https://augurk.github.io/img/icon128.png</iconUrl>
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>Command line tools for publishing feature files to Augurk.</description>
 		<releaseNotes>
-      Fixes an issue that occurs when a version is not specified while publishing feature files to Augurk.
-      A version number of 0.0.0 is now implied if no version number is specified.
+      This version integrates the new Gherkin parser instead of relying on the old SpecFlow specific parser. This makes
+      the total package a lot smaller as well. Due to some subtle differences in parsing (mainly indentation at the start of
+      a line in feature and scenario descriptions are now preserved), there is now a --compat-level flag that can be set to 2
+      (or lower) if necessary to fallback to the previous behavior.
     </releaseNotes>
-		<copyright>Copyright 2015</copyright>
-		<tags>augurk gherkin specflow commandline</tags>
+		<copyright>Copyright 2015-2017</copyright>
+		<tags>augurk gherkin specflow cucumber commandline</tags>
 	</metadata>
 	<files>
 		<file src="bin\$configuration$\augurk.exe" target="tools" />

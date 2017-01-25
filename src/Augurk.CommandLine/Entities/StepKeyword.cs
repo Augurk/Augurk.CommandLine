@@ -41,6 +41,11 @@ namespace Augurk.CommandLine.Entities
         /// The And keyword.
         /// Usage of this keyword masks the actual meaning, check the <see cref="BlockKeyword"/> for that.
         /// </summary>
-        And
+        And,
+        /// <summary>
+        /// The But keyword.
+        /// Usage of this keyword masks the actual meaning, check the <see cref="BlockKeyword"/> for that.
+        /// </summary>
+        But
     }
 }

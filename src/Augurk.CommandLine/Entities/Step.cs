@@ -45,5 +45,10 @@ namespace Augurk.CommandLine.Entities
         /// Gets or sets the table argument for this step.
         /// </summary>
         public Table TableArgument { get; set; }
+
+        /// <summary>
+        /// Gets or sets the <see cref="SourceLocation"/> for this step.
+        /// </summary>
+        public SourceLocation Location { get; set; }
     }
 }
