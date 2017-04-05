@@ -51,6 +51,15 @@ namespace Augurk.CommandLine.Commands
             // Publish the feature files
             Console.WriteLine("Starting publishing of feature files...");
             PublishFeatureFiles();
+
+            // Check for the existence of a product description
+            if (!string.IsNullOrWhiteSpace(_options.ProductName) && !string.IsNullOrWhiteSpace(_options.ProductDescription))
+            {
+                Console.WriteLine("Start publishing product description...");
+                PublishProductDescription();
+                Console.WriteLine("Done publishing product description.");
+            }
+
             Console.WriteLine("Done publishing feature files.");
         }
 
@@ -83,18 +92,17 @@ namespace Augurk.CommandLine.Commands
                         string targetUri = GetTargetUri(usev2api, groupUri, feature);
 
                         // Publish the feature
-                        var postTask = client.PostAsJsonAsync<Feature>(targetUri, feature);
-                        postTask.Wait();
+                        var response = client.PostAsJsonAsync<Feature>(targetUri, feature).Result;
 
                         // Process the result
-                        if (postTask.Result.IsSuccessStatusCode)
+                        if (response.IsSuccessStatusCode)
                         {
                             WriteSuccesfulPublishMessage(usev2api, feature);
 
                         }
                         else
                         {
-                            WriteUnsuccesfulPublishMessage(usev2api, targetUri, feature, postTask.Result);
+                            WriteUnsuccesfulPublishMessage(usev2api, targetUri, feature, response);
                         }
                     }
                     catch (CompositeParserException)
@@ -103,6 +111,7 @@ namespace Augurk.CommandLine.Commands
                     }
                     catch (Exception e)
                     {
+                        Console.Error.WriteLine($"An exception occured while uploading feature file '{featureFile}");
                         Console.Error.WriteLine(e.ToString());
                     }
                 }
@@ -277,6 +286,46 @@ namespace Augurk.CommandLine.Commands
             }
 
             return result;
+        }
+
+        /// <summary>
+        /// Publishes the product description.
+        /// </summary>
+        private void PublishProductDescription()
+        {
+            // Make sure that the product description file exists
+            if (!File.Exists(_options.ProductDescription))
+            {
+                Console.Error.WriteLine($"Product description file {_options.ProductDescription} does not exist!");
+                return;
+            }
+
+            // Upload the contents of the file to Augurk
+            using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
+            {
+                // Determine the Uri for the product and read the contents of the file
+                string productUri = $"{_options.AugurkUrl.TrimEnd('/')}/api/v2/products/{_options.ProductName}/description";
+                string body = File.ReadAllText(_options.ProductDescription);
+
+                try
+                {
+                    // Perform a Put request to the API
+                    var response = client.PutAsync(productUri, new StringContent(body, System.Text.Encoding.UTF8, "text/plain")).Result;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        Console.WriteLine($"Succesfully published product {_options.ProductName} description from {_options.ProductDescription}");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Publishing product {_options.ProductName} description to {productUri} resulted in status code {response.StatusCode}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.Error.WriteLine($"An error occured while publishing the product description file {_options.ProductDescription}");
+                    Console.Error.WriteLine(ex.ToString());
+                }
+            }
         }
     }
 }
