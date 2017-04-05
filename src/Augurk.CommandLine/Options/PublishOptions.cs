@@ -41,6 +41,13 @@ namespace Augurk.CommandLine.Options
         [Option("productName", HelpText = "Name of the product under which the feature files should be published. Cannot be used in combination with the --branchName option.", MutuallyExclusiveSet = "product/branch", Required = false)]
         public string ProductName { get; set; }
 
+
+        /// <summary>
+        /// Gets or sets a value indicating the filename of the Markdown file that should be uploaded as the product page.
+        /// </summary>
+        [Option("productDesc", HelpText = "Optional path to a Markdown file containing the product page for the specified product.", Required = false)]
+        public string ProductDescription { get; set; }
+
         /// <summary>
         /// Gets or sets the name of the group under which the feature files should be published.
         /// </summary>

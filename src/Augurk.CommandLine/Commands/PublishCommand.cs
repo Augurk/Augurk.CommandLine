@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
@@ -49,29 +48,23 @@ namespace Augurk.CommandLine.Commands
         /// </summary>
         public void Execute()
         {
-            // Determine the version of the API we're going to use
-            if (string.IsNullOrWhiteSpace(_options.ProductName))
-            {
-                // Execute the command by using V1 of the API
-                ExecuteUsingV1Api();
-            }
-            else
-            {
-                // Execute the command by using V2 of the API
-                ExecuteUsingV2Api();
-            }
+            // Publish the feature files
+            Console.WriteLine("Starting publishing of feature files...");
+            PublishFeatureFiles();
+            Console.WriteLine("Done publishing feature files.");
         }
 
-        private void ExecuteUsingV1Api()
+        private void PublishFeatureFiles()
         {
             // Create the HttpClient that will communicate with the API
+            bool usev2api = !string.IsNullOrWhiteSpace(_options.ProductName);
             using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
             {
                 // Get the base uri for all further operations
-                string groupUri = $"{_options.AugurkUrl.TrimEnd('/')}/api/features/{_options.BranchName}/{_options.GroupName ?? "Default"}";
+                string groupUri = GetGroupUri(usev2api);
 
                 // Clear any existing features in this group, if required
-                if (_options.ClearGroup)
+                if (!usev2api && _options.ClearGroup)
                 {
                     Console.WriteLine($"Clearing existing features in group {_options.GroupName ?? "Default"} for branch {_options.BranchName}.");
                     client.DeleteAsync(groupUri).Wait();
@@ -87,7 +80,7 @@ namespace Augurk.CommandLine.Commands
                         Feature feature = ParseFeatureFile(featureFile);
 
                         // Get the uri to which the feature should be published
-                        string targetUri = $"{groupUri}/{feature.Title}";
+                        string targetUri = GetTargetUri(usev2api, groupUri, feature);
 
                         // Publish the feature
                         var postTask = client.PostAsJsonAsync<Feature>(targetUri, feature);
@@ -96,21 +89,15 @@ namespace Augurk.CommandLine.Commands
                         // Process the result
                         if (postTask.Result.IsSuccessStatusCode)
                         {
-                            Console.WriteLine("Succesfully published feature '{0}' to group {1} for branch {2}.",
-                                                feature.Title,
-                                                _options.GroupName ?? "Default",
-                                                _options.BranchName);
+                            WriteSuccesfulPublishMessage(usev2api, feature);
 
                         }
                         else
                         {
-                            Console.Error.WriteLine("Publishing feature '{0}' to uri '{1}' resulted in statuscode '{2}'",
-                                                    feature.Title,
-                                                    targetUri,
-                                                    postTask.Result.StatusCode);
+                            WriteUnsuccesfulPublishMessage(usev2api, targetUri, feature, postTask.Result);
                         }
                     }
-                    catch (CompositeParserException e)
+                    catch (CompositeParserException)
                     {
                         Console.Error.WriteLine($"Unable to parse feature file '{featureFile}'. Are you missing a language comment or --language option?");
                     }
@@ -119,6 +106,78 @@ namespace Augurk.CommandLine.Commands
                         Console.Error.WriteLine(e.ToString());
                     }
                 }
+            }
+        }
+
+        /// <summary>
+        /// Gets the Uri to the group where the feature should be uploaded to.
+        /// </summary>
+        /// <param name="usev2api">Indicates whether version 2 of the API is being used.</param>
+        /// <returns>Returns a string containing the Uri to the group where features should be uploaded to.</returns>
+        private string GetGroupUri(bool usev2api)
+        {
+            if (usev2api)
+            {
+                return $"{_options.AugurkUrl.TrimEnd('/')}/api/v2/products/{_options.ProductName}/groups/{_options.GroupName}/features";
+            }
+            else
+            {
+                return $"{_options.AugurkUrl.TrimEnd('/')}/api/features/{_options.BranchName}/{_options.GroupName ?? "Default"}";
+            }
+        }
+
+        /// <summary>
+        /// Gets the Uri for the provided <paramref name="feature"/> within the provided <paramref name="groupUri"/>.
+        /// </summary>
+        /// <param name="usev2api">Indicates whether version 2 of the API is being used.</param>
+        /// <param name="groupUri">Uri to the group where the feature is going to be uploaded.</param>
+        /// <param name="feature">A <see cref="Feature"/> instance that is going to be uploaded.</param>
+        /// <returns>Returns a string containing the Uri to the feature file.</returns>
+        private string GetTargetUri(bool usev2api, string groupUri, Feature feature)
+        {
+            if (usev2api)
+            {
+                return $"{groupUri}/{feature.Title}/versions/{_options.Version}/";
+            }
+            else
+            {
+                return $"{groupUri}/{feature.Title}";
+            }
+        }
+
+        /// <summary>
+        /// Writes a message to the console indicating a succesful publish.
+        /// </summary>
+        /// <param name="usev2api">Indicates whether version 2 of the API is being used.</param>
+        /// <param name="feature">A <see cref="Feature"/> that was succesfully published.</param>
+        private void WriteSuccesfulPublishMessage(bool usev2api, Feature feature)
+        {
+            if (usev2api)
+            {
+                Console.WriteLine($"Succesfully published feature '{feature.Title}' version '{_options.Version}' for product '{_options.ProductName}' to group '{_options.GroupName}'.");
+            }
+            else
+            {
+                Console.WriteLine($"Succesfully published feature '{feature.Title}' to group '{_options.GroupName ?? "Default"}' for branch {_options.BranchName}.");
+            }
+        }
+
+        /// <summary>
+        /// Writes a message to the console indicating an unsuccesful publish.
+        /// </summary>
+        /// <param name="usev2api">Indicates whether version 2 of the API is being used.</param>
+        /// <param name="targetUri">Uri to which the upload was attempted.</param>
+        /// <param name="feature">A <see cref="Feature"/> that was succesfully published.</param>
+        /// <param name="responseMessage">Response message that was received.</param>
+        private void WriteUnsuccesfulPublishMessage(bool usev2api, string targetUri, Feature feature, HttpResponseMessage responseMessage)
+        {
+            if (usev2api)
+            {
+                Console.Error.WriteLine($"Publishing feature '{feature.Title}' version '{_options.Version}' to uri '{targetUri}' resulted in statuscode '{responseMessage.StatusCode}'");
+            }
+            else
+            {
+                Console.Error.WriteLine($"Publishing feature '{feature.Title}' to uri '{targetUri}' resulted in statuscode '{responseMessage.StatusCode}'");
             }
         }
 
@@ -178,52 +237,6 @@ namespace Augurk.CommandLine.Commands
             }
 
             return expandedList;
-        }
-
-        private void ExecuteUsingV2Api()
-        {
-            // Create the HttpClient that will communicate with the API
-            using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
-            {
-                // Get the base uri for all further operations
-                string groupUri = $"{_options.AugurkUrl.TrimEnd('/')}/api/v2/products/{_options.ProductName}/groups/{_options.GroupName}/features";
-
-                // Parse and publish each of the provided feature files
-                var expandedList = Expand(_options.FeatureFiles);
-                foreach (var featureFile in expandedList)
-                {
-                    try
-                    {
-                        // Parse the feature and convert it to the correct format
-                        Feature feature = ParseFeatureFile(featureFile);
-
-                        // Get the uri to which the feature should be published
-                        string targetUri = $"{groupUri}/{feature.Title}/versions/{_options.Version}/";
-
-                        // Publish the feature
-                        var postTask = client.PostAsJsonAsync<Feature>(targetUri, feature);
-                        postTask.Wait();
-
-                        // Process the result
-                        if (postTask.Result.IsSuccessStatusCode)
-                        {
-                            Console.WriteLine($"Succesfully published feature '{feature.Title}' version '{_options.Version}' for product '{_options.ProductName}' to group '{_options.GroupName}'.");
-                        }
-                        else
-                        {
-                            Console.Error.WriteLine($"Publishing feature '{feature.Title}' version '{_options.Version}' to uri '{targetUri}' resulted in statuscode '{postTask.Result.StatusCode}'");
-                        }
-                    }
-                    catch (CompositeParserException e)
-                    {
-                        Console.Error.WriteLine($"Unable to parse feature file '{featureFile}'. Are you missing a language comment or --language option?");
-                    }
-                    catch (Exception e)
-                    {
-                        Console.Error.WriteLine(e.ToString());
-                    }
-                }
-            }
         }
 
         private Feature ParseFeatureFile(string featureFile)
