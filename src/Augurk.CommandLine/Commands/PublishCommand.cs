@@ -316,11 +316,11 @@ namespace Augurk.CommandLine.Commands
                     var response = client.PutAsync(productUri, new StringContent(productDescription, System.Text.Encoding.UTF8, "text/plain")).Result;
                     if (response.IsSuccessStatusCode)
                     {
-                        Console.WriteLine($"Succesfully published product {_options.ProductName} description from {_options.ProductDescription}");
+                        Console.WriteLine($"Succesfully published description for product {_options.ProductName} from {_options.ProductDescription}");
                     }
                     else
                     {
-                        Console.WriteLine($"Publishing product {_options.ProductName} description to {productUri} resulted in status code {response.StatusCode}");
+                        Console.WriteLine($"Publishing description for product {_options.ProductName} to {productUri} resulted in status code {response.StatusCode}");
                     }
                 }
                 catch (Exception ex)
