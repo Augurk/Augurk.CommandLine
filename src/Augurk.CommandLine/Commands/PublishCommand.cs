@@ -305,12 +305,15 @@ namespace Augurk.CommandLine.Commands
             {
                 // Determine the Uri for the product and read the contents of the file
                 string productUri = $"{_options.AugurkUrl.TrimEnd('/')}/api/v2/products/{_options.ProductName}/description";
-                string body = File.ReadAllText(_options.ProductDescription);
+                string productDescription = File.ReadAllText(_options.ProductDescription);
+
+                // Process the description through the images embedder
+                productDescription = ProcessDescription(productDescription);
 
                 try
                 {
                     // Perform a Put request to the API
-                    var response = client.PutAsync(productUri, new StringContent(body, System.Text.Encoding.UTF8, "text/plain")).Result;
+                    var response = client.PutAsync(productUri, new StringContent(productDescription, System.Text.Encoding.UTF8, "text/plain")).Result;
                     if (response.IsSuccessStatusCode)
                     {
                         Console.WriteLine($"Succesfully published product {_options.ProductName} description from {_options.ProductDescription}");
