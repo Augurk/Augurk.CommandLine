@@ -252,7 +252,6 @@ namespace Augurk.CommandLine.Commands
         {
             using (var reader = new StreamReader(featureFile))
             {
-                Stack<string> directories = new Stack<string>();
                 var parser = new Parser();
                 var dialectProvider = new AugurkDialectProvider(_options.Language);
                 var tokenScanner = new TokenScanner(reader);
@@ -262,7 +261,7 @@ namespace Augurk.CommandLine.Commands
                 feature.SourceFilename = featureFile;
 
                 // change directory to feature-files directory
-                directories.Push(Directory.GetCurrentDirectory());
+                string savedDirectory = Directory.GetCurrentDirectory();
                 Directory.SetCurrentDirectory(Path.GetDirectoryName(featureFile));
 
                 feature.Description = ProcessDescription(feature.Description);
@@ -272,7 +271,7 @@ namespace Augurk.CommandLine.Commands
                 }
 
                 // reset current directory
-                Directory.SetCurrentDirectory(directories.Pop());
+                Directory.SetCurrentDirectory(savedDirectory);
 
                 return feature;
             }
