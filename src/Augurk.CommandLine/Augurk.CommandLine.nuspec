@@ -16,6 +16,9 @@
       the total package a lot smaller as well. Due to some subtle differences in parsing (mainly indentation at the start of
       a line in feature and scenario descriptions are now preserved), there is now a --compat-level flag that can be set to 2
       (or lower) if necessary to fallback to the previous behavior.
+      
+      Fixed a bug in PublishCommand that caused an error to occur when a relative directory containing multiple feature-files 
+      was specified using the --featureFiles argument.
     </releaseNotes>
 		<copyright>Copyright 2015-2017</copyright>
 		<tags>augurk gherkin specflow cucumber commandline</tags>
