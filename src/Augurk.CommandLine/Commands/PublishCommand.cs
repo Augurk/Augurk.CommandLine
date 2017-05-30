@@ -260,6 +260,8 @@ namespace Augurk.CommandLine.Commands
                 var feature = document.Feature.ConvertToFeature(dialectProvider.GetDialect(document.Feature.Language, document.Feature.Location));
                 feature.SourceFilename = featureFile;
 
+                // change directory to feature-files directory
+                string savedDirectory = Directory.GetCurrentDirectory();
                 Directory.SetCurrentDirectory(Path.GetDirectoryName(featureFile));
 
                 feature.Description = ProcessDescription(feature.Description);
@@ -267,6 +269,9 @@ namespace Augurk.CommandLine.Commands
                 {
                     scenario.Description = ProcessDescription(scenario.Description);
                 }
+
+                // reset current directory
+                Directory.SetCurrentDirectory(savedDirectory);
 
                 return feature;
             }
