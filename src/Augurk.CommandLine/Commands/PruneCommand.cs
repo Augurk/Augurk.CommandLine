@@ -52,13 +52,13 @@ namespace Augurk.CommandLine.Commands
         /// </summary>
         public void Execute()
         {
-            Console.WriteLine($"Pruning features in Augurk at {_options.AugurkUrl}");
+            Console.WriteLine($"Pruning features for product {_options.ProductName} in Augurk at {_options.AugurkUrl}");
             using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
             {
                 try
                 {
                     // Get features of the provided product (and group name if provided)
-                    var groups = string.IsNullOrWhiteSpace(_options.GroupName) ? this.GetFeaturesForProduct(client) : this.GetFeaturesForGroup(client);
+                    var groups = string.IsNullOrWhiteSpace(_options.GroupName) ? this.GetGroupsForProduct(client) : this.GetFeaturesForGroup(client);
                     foreach (var group in groups)
                     {
                         Console.WriteLine($"Processing features in group {group.Name}");
@@ -84,6 +84,8 @@ namespace Augurk.CommandLine.Commands
                             }
                         }
                     }
+
+                    Console.WriteLine("Finished pruning features.");
                 }
                 catch (Exception ex)
                 {
@@ -93,7 +95,7 @@ namespace Augurk.CommandLine.Commands
             }
         }
 
-        private IEnumerable<FeatureGroup> GetFeaturesForProduct(HttpClient client)
+        private IEnumerable<FeatureGroup> GetGroupsForProduct(HttpClient client)
         {
             var groupsUri = $"{_options.AugurkUrl}/api/v2/products/{_options.ProductName}/groups";
             var response = client.GetAsync(groupsUri).Result;
@@ -128,6 +130,7 @@ namespace Augurk.CommandLine.Commands
         {
             var versionUri = $"{_options.AugurkUrl}/api/v2/products/{_options.ProductName}/groups/{groupName}/features/{feature.Title}/versions/{version}/";
             var response = client.DeleteAsync(versionUri).Result;
+            Console.WriteLine($"\t\tDeleted version {version} of feature {feature.Title}");
             response.EnsureSuccessStatusCode();
         }
     }
