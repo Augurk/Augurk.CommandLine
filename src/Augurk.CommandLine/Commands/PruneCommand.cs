@@ -76,7 +76,12 @@ namespace Augurk.CommandLine.Commands
                                 versionsToDelete = versions.Where(version => Regex.Match(version, _options.VersionRegex).Success).ToList();
                             }
 
-                            Console.WriteLine($"\tFound {versions.Count} versions for feature {feature.Title} of which {versionsToDelete.Count} will be deleted");
+                            Console.WriteLine($"\tFound {versions.Count} version(s) for feature {feature.Title} of which {versionsToDelete.Count} will be deleted");
+
+                            foreach (var versionToDelete in versionsToDelete)
+                            {
+                                DeleteVersionOfFeature(client, group.Name, feature, versionToDelete);
+                            }
                         }
                     }
                 }
@@ -113,11 +118,17 @@ namespace Augurk.CommandLine.Commands
         private IEnumerable<string> GetVersionsForFeature(HttpClient client, string groupName, FeatureDescription feature)
         {
             var versionsUri = $"{_options.AugurkUrl}/api/v2/products/{_options.ProductName}/groups/{groupName}/features/{feature.Title}/versions";
-            Console.WriteLine(versionsUri);
             var response = client.GetAsync(versionsUri).Result;
             response.EnsureSuccessStatusCode();
 
             return JsonConvert.DeserializeObject<IEnumerable<string>>(response.Content.ReadAsStringAsync().Result);
+        }
+
+        private void DeleteVersionOfFeature(HttpClient client, string groupName, FeatureDescription feature, string version)
+        {
+            var versionUri = $"{_options.AugurkUrl}/api/v2/products/{_options.ProductName}/groups/{groupName}/features/{feature.Title}/versions/{version}/";
+            var response = client.DeleteAsync(versionUri).Result;
+            response.EnsureSuccessStatusCode();
         }
     }
 }
