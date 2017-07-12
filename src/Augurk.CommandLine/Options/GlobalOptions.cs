@@ -37,6 +37,12 @@ namespace Augurk.CommandLine.Options
         public DeleteOptions DeleteVerb { get; set; }
 
         /// <summary>
+        /// Options when pruning features.
+        /// </summary>
+        [VerbOption(PruneOptions.VERB_NAME, HelpText = "Prunes specific versions from products in Augurk.")]
+        public PruneOptions PruneVerb { get; set; }
+
+        /// <summary>
         /// Gets the usage of the command line tool for the specified verb.
         /// </summary>
         /// <param name="verb">Name of the verb for which the usage should be retrieved.</param>

@@ -79,11 +79,14 @@
     <Compile Include="Commands\DeleteCommand.cs" />
     <Compile Include="Commands\ICommand.cs" />
     <Compile Include="Commands\ICommandMetadata.cs" />
+    <Compile Include="Commands\PruneCommand.cs" />
     <Compile Include="Commands\PublishCommand.cs" />
     <Compile Include="Entities\Background.cs" />
     <Compile Include="Entities\BlockKeyword.cs" />
     <Compile Include="Entities\ExampleSet.cs" />
     <Compile Include="Entities\Feature.cs" />
+    <Compile Include="Entities\FeatureDescription.cs" />
+    <Compile Include="Entities\FeatureGroup.cs" />
     <Compile Include="Entities\Scenario.cs" />
     <Compile Include="Entities\SourceLocation.cs" />
     <Compile Include="Entities\Step.cs" />
@@ -94,6 +97,7 @@
     <Compile Include="Extensions\GherkinEntityExtensions.cs" />
     <Compile Include="Options\DeleteOptions.cs" />
     <Compile Include="Options\GlobalOptions.cs" />
+    <Compile Include="Options\PruneOptions.cs" />
     <Compile Include="Options\PublishOptions.cs" />
     <Compile Include="Options\SharedOptions.cs" />
     <Compile Include="Plumbing\AugurkDialectProvider.cs" />
