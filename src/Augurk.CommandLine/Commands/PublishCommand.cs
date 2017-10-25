@@ -279,7 +279,10 @@ namespace Augurk.CommandLine.Commands
 
         private string ProcessDescription(string originalDescription)
         {
-            if (originalDescription == null) { return originalDescription; }
+            if (String.IsNullOrEmpty(originalDescription)) 
+            { 
+                return originalDescription; 
+            }
 
             string result = originalDescription;
             if (_options.CompatibilityLevel <= 2)
