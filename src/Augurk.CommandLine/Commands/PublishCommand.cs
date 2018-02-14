@@ -69,6 +69,9 @@ namespace Augurk.CommandLine.Commands
             bool usev2api = !string.IsNullOrWhiteSpace(_options.ProductName);
             using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
             {
+                // Retrieve the Augurk version
+                string version = client.GetAugurkVersionAsync().GetAwaiter().GetResult();
+
                 // Get the base uri for all further operations
                 string groupUri = GetGroupUri(usev2api);
 
@@ -127,11 +130,11 @@ namespace Augurk.CommandLine.Commands
         {
             if (usev2api)
             {
-                return $"{_options.AugurkUrl.TrimEnd('/')}/api/v2/products/{_options.ProductName}/groups/{_options.GroupName}/features";
+                return $"api/v2/products/{_options.ProductName}/groups/{_options.GroupName}/features";
             }
             else
             {
-                return $"{_options.AugurkUrl.TrimEnd('/')}/api/features/{_options.BranchName}/{_options.GroupName ?? "Default"}";
+                return $"api/features/{_options.BranchName}/{_options.GroupName ?? "Default"}";
             }
         }
 
@@ -313,8 +316,11 @@ namespace Augurk.CommandLine.Commands
             // Upload the contents of the file to Augurk
             using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
             {
+                // Retrieve the Augurk version
+                string version = client.GetAugurkVersionAsync().GetAwaiter().GetResult();
+
                 // Determine the Uri for the product and read the contents of the file
-                string productUri = $"{_options.AugurkUrl.TrimEnd('/')}/api/v2/products/{_options.ProductName}/description";
+                string productUri = $"api/v2/products/{_options.ProductName}/description";
                 string productDescription = File.ReadAllText(_options.ProductDescription);
 
                 // Process the description through the images embedder

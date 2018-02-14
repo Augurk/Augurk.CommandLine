@@ -40,6 +40,12 @@ namespace Augurk.CommandLine.Plumbing
             }
 
             var client = new HttpClient();
+            string baseUrl = options.AugurkUrl;
+            if (!baseUrl.EndsWith("/"))
+            {
+                baseUrl = $"{baseUrl}/";
+            }
+            client.BaseAddress = new Uri(options.AugurkUrl);
 
             if (options.UseBasicAuthentication)
             {

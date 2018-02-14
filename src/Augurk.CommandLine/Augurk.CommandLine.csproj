@@ -93,6 +93,7 @@
     <Compile Include="Entities\StepKeyword.cs" />
     <Compile Include="Entities\Table.cs" />
     <Compile Include="Extensions\CompositionContainerExtensions.cs" />
+    <Compile Include="Extensions\HttpClientExtensions.cs" />
     <Compile Include="Extensions\MarkdownExtensions.cs" />
     <Compile Include="Extensions\GherkinEntityExtensions.cs" />
     <Compile Include="Options\DeleteOptions.cs" />

@@ -46,7 +46,7 @@ namespace Augurk.CommandLine.Commands
         public void Execute()
         {
             // Determine the base Uri we're going to perform the delete on
-            var baseUri = new Uri($"{_options.AugurkUrl}/api/v2/products/{_options.ProductName}/");
+            var baseUri = new Uri($"api/v2/products/{_options.ProductName}/");
             var deleteUri = baseUri;
 
             // If a group name is specified
@@ -80,6 +80,9 @@ namespace Augurk.CommandLine.Commands
             // Perform the delete operation
             using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
             {
+                // Retrieve the Augurk version
+                string version = client.GetAugurkVersionAsync().GetAwaiter().GetResult();
+
                 // Call the URL
                 var response = client.DeleteAsync(deleteUri).Result;
                 if (response.IsSuccessStatusCode)

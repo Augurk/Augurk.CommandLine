@@ -57,6 +57,9 @@ namespace Augurk.CommandLine.Commands
             {
                 try
                 {
+                    // Retrieve the Augurk version
+                    string version = client.GetAugurkVersionAsync().GetAwaiter().GetResult();
+
                     // Get features of the provided product (and group name if provided)
                     var groups = string.IsNullOrWhiteSpace(_options.GroupName) ? this.GetGroupsForProduct(client) : this.GetFeaturesForGroup(client);
                     foreach (var group in groups)
@@ -69,11 +72,11 @@ namespace Augurk.CommandLine.Commands
                             List<string> versionsToDelete;
                             if (_options.PrereleaseOnly)
                             {
-                                versionsToDelete = versions.Where(version => version.Contains("-")).ToList();
+                                versionsToDelete = versions.Where(v => v.Contains("-")).ToList();
                             }
                             else
                             {
-                                versionsToDelete = versions.Where(version => Regex.Match(version, _options.VersionRegex).Success).ToList();
+                                versionsToDelete = versions.Where(v => Regex.Match(v, _options.VersionRegex).Success).ToList();
                             }
 
                             Console.WriteLine($"\tFound {versions.Count} version(s) for feature {feature.Title} of which {versionsToDelete.Count} will be deleted");
@@ -97,7 +100,7 @@ namespace Augurk.CommandLine.Commands
 
         private IEnumerable<FeatureGroup> GetGroupsForProduct(HttpClient client)
         {
-            var groupsUri = $"{_options.AugurkUrl}/api/v2/products/{_options.ProductName}/groups";
+            var groupsUri = $"api/v2/products/{_options.ProductName}/groups";
             var response = client.GetAsync(groupsUri).Result;
             response.EnsureSuccessStatusCode();
 
@@ -106,7 +109,7 @@ namespace Augurk.CommandLine.Commands
 
         private IEnumerable<FeatureGroup> GetFeaturesForGroup(HttpClient client)
         {
-            var groupUri = $"{_options.AugurkUrl}/api/v2/products/{_options.ProductName}/groups/{_options.GroupName}/features";
+            var groupUri = $"api/v2/products/{_options.ProductName}/groups/{_options.GroupName}/features";
             var response = client.GetAsync(groupUri).Result;
             response.EnsureSuccessStatusCode();
 
@@ -119,7 +122,7 @@ namespace Augurk.CommandLine.Commands
 
         private IEnumerable<string> GetVersionsForFeature(HttpClient client, string groupName, FeatureDescription feature)
         {
-            var versionsUri = $"{_options.AugurkUrl}/api/v2/products/{_options.ProductName}/groups/{groupName}/features/{feature.Title}/versions";
+            var versionsUri = $"api/v2/products/{_options.ProductName}/groups/{groupName}/features/{feature.Title}/versions";
             var response = client.GetAsync(versionsUri).Result;
             response.EnsureSuccessStatusCode();
 
@@ -128,7 +131,7 @@ namespace Augurk.CommandLine.Commands
 
         private void DeleteVersionOfFeature(HttpClient client, string groupName, FeatureDescription feature, string version)
         {
-            var versionUri = $"{_options.AugurkUrl}/api/v2/products/{_options.ProductName}/groups/{groupName}/features/{feature.Title}/versions/{version}/";
+            var versionUri = $"api/v2/products/{_options.ProductName}/groups/{groupName}/features/{feature.Title}/versions/{version}/";
             var response = client.DeleteAsync(versionUri).Result;
             Console.WriteLine($"\t\tDeleted version {version} of feature {feature.Title}");
             response.EnsureSuccessStatusCode();
