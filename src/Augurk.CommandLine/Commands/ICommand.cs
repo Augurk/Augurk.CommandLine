@@ -24,6 +24,6 @@ namespace Augurk.CommandLine.Commands
         /// <summary>
         /// Called when the command should be executed.
         /// </summary>
-        void Execute();
+        int Execute();
     }
 }

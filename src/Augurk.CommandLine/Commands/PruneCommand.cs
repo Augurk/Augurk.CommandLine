@@ -21,7 +21,6 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Collections.Generic;
-using System.ComponentModel.Composition;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 
@@ -30,8 +29,6 @@ namespace Augurk.CommandLine.Commands
     /// <summary>
     /// Implements the prune command.
     /// </summary>
-    [Export(typeof(ICommand))]
-    [ExportMetadata("Verb", PruneOptions.VERB_NAME)]
     internal class PruneCommand : ICommand
     {
         private readonly PruneOptions _options;
@@ -40,7 +37,6 @@ namespace Augurk.CommandLine.Commands
         /// Default constructor for this class.
         /// </summary>
         /// <param name="options">A <see cref="PruneOptions"/> instance containing the relevant options for the command.</param>
-        [ImportingConstructor]
         public PruneCommand(PruneOptions options)
         {
             _options = options;
@@ -50,7 +46,7 @@ namespace Augurk.CommandLine.Commands
         /// <summary>
         /// Called when the command is to be executed.
         /// </summary>
-        public void Execute()
+        public int Execute()
         {
             Console.WriteLine($"Pruning features for product {_options.ProductName} in Augurk at {_options.AugurkUrl}");
             using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
@@ -86,11 +82,13 @@ namespace Augurk.CommandLine.Commands
                     }
 
                     Console.WriteLine("Finished pruning features.");
+                    return 0;
                 }
                 catch (Exception ex)
                 {
                     Console.Error.WriteLine($"An error occured while pruning features in Augurk at {_options.AugurkUrl}");
                     Console.Error.WriteLine(ex.ToString());
+                    return -1;
                 }
             }
         }

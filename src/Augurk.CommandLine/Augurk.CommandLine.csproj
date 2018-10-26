@@ -59,10 +59,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Commands\CommandManager.cs" />
     <Compile Include="Commands\DeleteCommand.cs" />
     <Compile Include="Commands\ICommand.cs" />
-    <Compile Include="Commands\ICommandMetadata.cs" />
     <Compile Include="Commands\PruneCommand.cs" />
     <Compile Include="Commands\PublishCommand.cs" />
     <Compile Include="Entities\Background.cs" />
@@ -76,11 +74,9 @@
     <Compile Include="Entities\Step.cs" />
     <Compile Include="Entities\StepKeyword.cs" />
     <Compile Include="Entities\Table.cs" />
-    <Compile Include="Extensions\CompositionContainerExtensions.cs" />
     <Compile Include="Extensions\MarkdownExtensions.cs" />
     <Compile Include="Extensions\GherkinEntityExtensions.cs" />
     <Compile Include="Options\DeleteOptions.cs" />
-    <Compile Include="Options\GlobalOptions.cs" />
     <Compile Include="Options\PruneOptions.cs" />
     <Compile Include="Options\PublishOptions.cs" />
     <Compile Include="Options\SharedOptions.cs" />
@@ -107,16 +103,16 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommandLineParser">
-      <Version>1.9.71</Version>
+      <Version>2.3.0</Version>
     </PackageReference>
     <PackageReference Include="Gherkin">
-      <Version>4.0.0</Version>
+      <Version>5.1.0</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNet.WebApi.Client">
-      <Version>5.2.3</Version>
+      <Version>5.2.6</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>9.0.1</Version>
+      <Version>11.0.2</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

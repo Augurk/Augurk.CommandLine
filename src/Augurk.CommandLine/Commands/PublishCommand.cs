@@ -21,7 +21,6 @@ using System.Linq;
 using System.Net.Http;
 using Augurk.CommandLine.Options;
 using Augurk.CommandLine.Entities;
-using System.ComponentModel.Composition;
 using Augurk.CommandLine.Extensions;
 using Augurk.CommandLine.Plumbing;
 using Gherkin;
@@ -31,13 +30,10 @@ namespace Augurk.CommandLine.Commands
     /// <summary>
     /// Implements the publish command.
     /// </summary>
-    [Export(typeof(ICommand))]
-    [ExportMetadata("Verb", PublishOptions.VERB_NAME)]
     internal class PublishCommand : ICommand
     {
         private readonly PublishOptions _options;
 
-        [ImportingConstructor]
         public PublishCommand(PublishOptions options)
         {
             _options = options;
@@ -46,7 +42,7 @@ namespace Augurk.CommandLine.Commands
         /// <summary>
         /// Executes the command.
         /// </summary>
-        public void Execute()
+        public int Execute()
         {
             // Publish the feature files
             Console.WriteLine("Starting publishing of feature files...");
@@ -61,6 +57,7 @@ namespace Augurk.CommandLine.Commands
             }
 
             Console.WriteLine("Done publishing feature files.");
+            return 0;
         }
 
         private void PublishFeatureFiles()

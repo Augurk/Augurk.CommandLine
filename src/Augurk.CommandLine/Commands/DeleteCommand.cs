@@ -17,15 +17,12 @@
 using Augurk.CommandLine.Options;
 using Augurk.CommandLine.Plumbing;
 using System;
-using System.ComponentModel.Composition;
 
 namespace Augurk.CommandLine.Commands
 {
     /// <summary>
     /// Implements the delete command.
     /// </summary>
-    [Export(typeof(ICommand))]
-    [ExportMetadata("Verb", DeleteOptions.VERB_NAME)]
     internal class DeleteCommand : ICommand
     {
         private readonly DeleteOptions _options;
@@ -34,7 +31,6 @@ namespace Augurk.CommandLine.Commands
         /// Default constructor for this class.
         /// </summary>
         /// <param name="options">A <see cref="DeleteOptions"/> instance containing the relevant options for the command.</param>
-        [ImportingConstructor]
         public DeleteCommand(DeleteOptions options)
         {
             _options = options;
@@ -43,7 +39,7 @@ namespace Augurk.CommandLine.Commands
         /// <summary>
         /// Called when the command is to be executed.
         /// </summary>
-        public void Execute()
+        public int Execute()
         {
             // Determine the base Uri we're going to perform the delete on
             var baseUri = new Uri($"{_options.AugurkUrl}/api/v2/products/{_options.ProductName}/");
@@ -63,7 +59,7 @@ namespace Augurk.CommandLine.Commands
                 if (String.IsNullOrWhiteSpace(_options.GroupName))
                 {
                     Console.WriteLine("When deleting a specific feature a group name that the feature belongs to must also be specified.");
-                    return;
+                    return -1;
                 }
 
                 // Append the feature name to the base uri
@@ -105,6 +101,8 @@ namespace Augurk.CommandLine.Commands
                     }
                 }
             }
+
+            return 0;
         }
     }
 }
