@@ -1,4 +1,2 @@
-next-version: 3.2.0
-branches: {}
-ignore:
-  sha: []
+next-version: 4.0.0
+mode: Mainline
