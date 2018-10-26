@@ -26,7 +26,6 @@ namespace Augurk.CommandLine
     /// </summary>
     static class Program
     {
-
         /// <summary>
         /// Called when the command line tool starts.
         /// </summary>
@@ -40,7 +39,7 @@ namespace Augurk.CommandLine
                     (PublishOptions options) => new PublishCommand(options).Execute(),
                     (DeleteOptions options) => new DeleteCommand(options).Execute(),
                     (PruneOptions options) => new PruneCommand(options).Execute(),
-                    errs => 1
+                    errs => -1
                 );
 
 #if DEBUG
