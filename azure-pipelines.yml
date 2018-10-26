@@ -26,7 +26,7 @@ jobs:
     - task: DotNetCoreCLI@2
       inputs:
         command: test
-        projects: 'src/Augurk.CommandLine/Augurk.CommandLine.UnitTest.csproj'
+        projects: 'src/Augurk.CommandLine.UnitTest/Augurk.CommandLine.UnitTest.csproj'
         continueOnError: true
 
     - task: DotNetCoreCLI@2
@@ -74,7 +74,7 @@ jobs:
     - task: DotNetCoreCLI@2
       inputs:
         command: test
-        projects: 'src/Augurk.CommandLine/Augurk.CommandLine.UnitTest.csproj'
+        projects: 'src/Augurk.CommandLine.UnitTest/Augurk.CommandLine.UnitTest.csproj'
         continueOnError: true
 
     - task: DotNetCoreCLI@2
@@ -116,7 +116,7 @@ jobs:
     - task: DotNetCoreCLI@2
       inputs:
         command: test
-        projects: 'src/Augurk.CommandLine/Augurk.CommandLine.UnitTest.csproj'
+        projects: 'src/Augurk.CommandLine.UnitTest/Augurk.CommandLine.UnitTest.csproj'
         continueOnError: true
 
     - task: DotNetCoreCLI@2
