@@ -52,6 +52,7 @@ namespace Augurk.CommandLine.Extensions
             {
                 Group fileGroup = match.Groups["file"];
 
+                string path = Path.Join(Environment.CurrentDirectory, fileGroup.Value);
                 if (File.Exists(fileGroup.Value))
                 {
                     using (var image = Image.Load(fileGroup.Value, out IImageFormat format))
