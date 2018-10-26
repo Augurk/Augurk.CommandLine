@@ -86,6 +86,8 @@ namespace Augurk.CommandLine.Commands
                     {
                         Console.WriteLine($"Succesfully deleted features from Augurk at {Options.AugurkUrl}");
                     }
+
+                    return 0;
                 }
                 else
                 {
@@ -97,10 +99,10 @@ namespace Augurk.CommandLine.Commands
                     {
                         Console.WriteLine($"Deleting features from Augurk at {Options.AugurkUrl} failed with statuscode {response.StatusCode}");
                     }
+
+                    return -1;
                 }
             }
-
-            return 0;
         }
     }
 }

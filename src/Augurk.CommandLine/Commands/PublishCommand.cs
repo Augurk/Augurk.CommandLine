@@ -44,7 +44,11 @@ namespace Augurk.CommandLine.Commands
         {
             // Publish the feature files
             Console.WriteLine("Starting publishing of feature files...");
-            PublishFeatureFiles();
+            int exitCode = PublishFeatureFiles();
+            if (exitCode != 0)
+            {
+                return exitCode;
+            }
 
             // Check for the existence of a product description
             if (!string.IsNullOrWhiteSpace(Options.ProductName) && !string.IsNullOrWhiteSpace(Options.ProductDescription))
@@ -58,7 +62,7 @@ namespace Augurk.CommandLine.Commands
             return 0;
         }
 
-        private void PublishFeatureFiles()
+        private int PublishFeatureFiles()
         {
             // Create the HttpClient that will communicate with the API
             bool usev2api = !string.IsNullOrWhiteSpace(Options.ProductName);
@@ -71,7 +75,16 @@ namespace Augurk.CommandLine.Commands
                 if (!usev2api && Options.ClearGroup)
                 {
                     Console.WriteLine($"Clearing existing features in group {Options.GroupName ?? "Default"} for branch {Options.BranchName}.");
-                    client.DeleteAsync(groupUri).Wait();
+                    try
+                    {
+                        client.DeleteAsync(groupUri).Wait();
+                    }
+                    catch (Exception e)
+                    {
+                        Console.Error.WriteLine($"An exception occured while clearing existing features in group {Options.GroupName ?? "Default"} for branch {Options.BranchName}.");
+                        Console.Error.WriteLine(e.ToString());
+                        return -1;
+                    }
                 }
 
                 // Parse and publish each of the provided feature files
@@ -93,7 +106,6 @@ namespace Augurk.CommandLine.Commands
                         if (response.IsSuccessStatusCode)
                         {
                             WriteSuccesfulPublishMessage(usev2api, feature);
-
                         }
                         else
                         {
@@ -103,14 +115,18 @@ namespace Augurk.CommandLine.Commands
                     catch (CompositeParserException)
                     {
                         Console.Error.WriteLine($"Unable to parse feature file '{featureFile}'. Are you missing a language comment or --language option?");
+                        return -1;
                     }
                     catch (Exception e)
                     {
                         Console.Error.WriteLine($"An exception occured while uploading feature file '{featureFile}");
                         Console.Error.WriteLine(e.ToString());
+                        return -1;
                     }
                 }
             }
+
+            return 0;
         }
 
         /// <summary>
