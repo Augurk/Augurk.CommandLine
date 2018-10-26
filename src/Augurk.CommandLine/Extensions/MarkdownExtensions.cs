@@ -74,6 +74,11 @@ namespace Augurk.CommandLine.Extensions
                         }
                     }
                 }
+                else
+                {
+                    Console.WriteLine($"warning: Unable to find referenced image {path}");
+                }
+
                 // Move to the next match
                 match = match.NextMatch();
             }
