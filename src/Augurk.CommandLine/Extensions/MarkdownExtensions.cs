@@ -54,24 +54,24 @@ namespace Augurk.CommandLine.Extensions
 
                 if (File.Exists(fileGroup.Value))
                 {
-                    Image image = Image.FromFile(fileGroup.Value);
-
-                    // Determine the mimetype
-                    string mimeType = codecs.First(codec => codec.FormatID == image.RawFormat.Guid).MimeType;
-
-                    using (var ms = new MemoryStream())
+                    using (Image image = Image.FromFile(fileGroup.Value))
                     {
-                        // Save the image in a stream so we can convert it to a string
-                        image.Save(ms, image.RawFormat);
+                        // Determine the mimetype
+                        string mimeType = codecs.First(codec => codec.FormatID == image.RawFormat.Guid).MimeType;
+                        using (var ms = new MemoryStream())
+                        {
+                            // Save the image in a stream so we can convert it to a string
+                            image.Save(ms, image.RawFormat);
 
-                        // Use the data URI syntax (RFC 2397)
-                        string encodedFile = $"data:{mimeType};base64,{Convert.ToBase64String(ms.ToArray())}";
+                            // Use the data URI syntax (RFC 2397)
+                            string encodedFile = $"data:{mimeType};base64,{Convert.ToBase64String(ms.ToArray())}";
 
-                        // Replace the original filename with the encoded file
-                        resultMarkdown = $"{resultMarkdown.Substring(0, fileGroup.Index + offset)}{encodedFile}{resultMarkdown.Substring(fileGroup.Index + fileGroup.Length + offset)}";
+                            // Replace the original filename with the encoded file
+                            resultMarkdown = $"{resultMarkdown.Substring(0, fileGroup.Index + offset)}{encodedFile}{resultMarkdown.Substring(fileGroup.Index + fileGroup.Length + offset)}";
 
-                        // Determine the change in length of the file, to use as offset for following matches
-                        offset += encodedFile.Length - fileGroup.Length;
+                            // Determine the change in length of the file, to use as offset for following matches
+                            offset += encodedFile.Length - fileGroup.Length;
+                        }
                     }
                 }
                 // Move to the next match

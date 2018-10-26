@@ -32,13 +32,13 @@ namespace Augurk.CommandLine.Options
         /// <summary>
         /// Flag to indicate that the tool must run under integrated security to access the Augurk API's.
         /// </summary>
-        [Option("useIntegratedSecurity", HelpText = "Use integrated security to access the Augurk API's. Do not specify username and password when using integrated security", SetName = "security", Required = false)]
+        [Option("useIntegratedSecurity", HelpText = "Use integrated security to access the Augurk API's. Do not specify username and password when using integrated security", Required = false)]
         public bool UseIntegratedSecurity { get; set; }
 
         /// <summary>
         /// Flag to indicate that the tool must use basic HTTP authentication to access the Augurk API's.
         /// </summary>
-        [Option("useBasicAuthentication", HelpText = "Use basic HTTP authentication to access the Augurk API's. You must also specify a username and a password.", SetName = "security", Required = false)]
+        [Option("useBasicAuthentication", HelpText = "Use basic HTTP authentication to access the Augurk API's. You must also specify a username and a password.", Required = false)]
         public bool UseBasicAuthentication { get; set; }
 
         /// <summary>

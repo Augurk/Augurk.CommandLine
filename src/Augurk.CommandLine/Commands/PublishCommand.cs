@@ -30,26 +30,24 @@ namespace Augurk.CommandLine.Commands
     /// <summary>
     /// Implements the publish command.
     /// </summary>
-    internal class PublishCommand : ICommand
+    internal class PublishCommand : BaseCommand<PublishOptions>
     {
-        private readonly PublishOptions _options;
-
         public PublishCommand(PublishOptions options)
+            : base(options)
         {
-            _options = options;
         }
 
         /// <summary>
         /// Executes the command.
         /// </summary>
-        public int Execute()
+        protected override int ExecuteCore()
         {
             // Publish the feature files
             Console.WriteLine("Starting publishing of feature files...");
             PublishFeatureFiles();
 
             // Check for the existence of a product description
-            if (!string.IsNullOrWhiteSpace(_options.ProductName) && !string.IsNullOrWhiteSpace(_options.ProductDescription))
+            if (!string.IsNullOrWhiteSpace(Options.ProductName) && !string.IsNullOrWhiteSpace(Options.ProductDescription))
             {
                 Console.WriteLine("Start publishing product description...");
                 PublishProductDescription();
@@ -63,21 +61,21 @@ namespace Augurk.CommandLine.Commands
         private void PublishFeatureFiles()
         {
             // Create the HttpClient that will communicate with the API
-            bool usev2api = !string.IsNullOrWhiteSpace(_options.ProductName);
-            using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
+            bool usev2api = !string.IsNullOrWhiteSpace(Options.ProductName);
+            using (var client = AugurkHttpClientFactory.CreateHttpClient(Options))
             {
                 // Get the base uri for all further operations
                 string groupUri = GetGroupUri(usev2api);
 
                 // Clear any existing features in this group, if required
-                if (!usev2api && _options.ClearGroup)
+                if (!usev2api && Options.ClearGroup)
                 {
-                    Console.WriteLine($"Clearing existing features in group {_options.GroupName ?? "Default"} for branch {_options.BranchName}.");
+                    Console.WriteLine($"Clearing existing features in group {Options.GroupName ?? "Default"} for branch {Options.BranchName}.");
                     client.DeleteAsync(groupUri).Wait();
                 }
 
                 // Parse and publish each of the provided feature files
-                var expandedList = Expand(_options.FeatureFiles);
+                var expandedList = Expand(Options.FeatureFiles);
                 foreach (var featureFile in expandedList)
                 {
                     try
@@ -124,11 +122,11 @@ namespace Augurk.CommandLine.Commands
         {
             if (usev2api)
             {
-                return $"{_options.AugurkUrl.TrimEnd('/')}/api/v2/products/{_options.ProductName}/groups/{_options.GroupName}/features";
+                return $"{Options.AugurkUrl.TrimEnd('/')}/api/v2/products/{Options.ProductName}/groups/{Options.GroupName}/features";
             }
             else
             {
-                return $"{_options.AugurkUrl.TrimEnd('/')}/api/features/{_options.BranchName}/{_options.GroupName ?? "Default"}";
+                return $"{Options.AugurkUrl.TrimEnd('/')}/api/features/{Options.BranchName}/{Options.GroupName ?? "Default"}";
             }
         }
 
@@ -143,7 +141,7 @@ namespace Augurk.CommandLine.Commands
         {
             if (usev2api)
             {
-                return $"{groupUri}/{feature.Title}/versions/{_options.Version}/";
+                return $"{groupUri}/{feature.Title}/versions/{Options.Version}/";
             }
             else
             {
@@ -160,11 +158,11 @@ namespace Augurk.CommandLine.Commands
         {
             if (usev2api)
             {
-                Console.WriteLine($"Succesfully published feature '{feature.Title}' version '{_options.Version}' for product '{_options.ProductName}' to group '{_options.GroupName}'.");
+                Console.WriteLine($"Succesfully published feature '{feature.Title}' version '{Options.Version}' for product '{Options.ProductName}' to group '{Options.GroupName}'.");
             }
             else
             {
-                Console.WriteLine($"Succesfully published feature '{feature.Title}' to group '{_options.GroupName ?? "Default"}' for branch {_options.BranchName}.");
+                Console.WriteLine($"Succesfully published feature '{feature.Title}' to group '{Options.GroupName ?? "Default"}' for branch {Options.BranchName}.");
             }
         }
 
@@ -179,7 +177,7 @@ namespace Augurk.CommandLine.Commands
         {
             if (usev2api)
             {
-                Console.Error.WriteLine($"Publishing feature '{feature.Title}' version '{_options.Version}' to uri '{targetUri}' resulted in statuscode '{responseMessage.StatusCode}'");
+                Console.Error.WriteLine($"Publishing feature '{feature.Title}' version '{Options.Version}' to uri '{targetUri}' resulted in statuscode '{responseMessage.StatusCode}'");
             }
             else
             {
@@ -250,7 +248,7 @@ namespace Augurk.CommandLine.Commands
             using (var reader = new StreamReader(featureFile))
             {
                 var parser = new Parser();
-                var dialectProvider = new AugurkDialectProvider(_options.Language);
+                var dialectProvider = new AugurkDialectProvider(Options.Language);
                 var tokenScanner = new TokenScanner(reader);
                 var tokenMatcher = new TokenMatcher(dialectProvider);
                 var document = parser.Parse(tokenScanner, tokenMatcher);
@@ -282,12 +280,12 @@ namespace Augurk.CommandLine.Commands
             }
 
             string result = originalDescription;
-            if (_options.CompatibilityLevel <= 2)
+            if (Options.CompatibilityLevel <= 2)
             {
                 result = result.TrimLineStart();
             }
 
-            if (_options.Embed)
+            if (Options.Embed)
             {
                 result = result.EmbedImages();
             }
@@ -301,18 +299,18 @@ namespace Augurk.CommandLine.Commands
         private void PublishProductDescription()
         {
             // Make sure that the product description file exists
-            if (!File.Exists(_options.ProductDescription))
+            if (!File.Exists(Options.ProductDescription))
             {
-                Console.Error.WriteLine($"Product description file {_options.ProductDescription} does not exist!");
+                Console.Error.WriteLine($"Product description file {Options.ProductDescription} does not exist!");
                 return;
             }
 
             // Upload the contents of the file to Augurk
-            using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
+            using (var client = AugurkHttpClientFactory.CreateHttpClient(Options))
             {
                 // Determine the Uri for the product and read the contents of the file
-                string productUri = $"{_options.AugurkUrl.TrimEnd('/')}/api/v2/products/{_options.ProductName}/description";
-                string productDescription = File.ReadAllText(_options.ProductDescription);
+                string productUri = $"{Options.AugurkUrl.TrimEnd('/')}/api/v2/products/{Options.ProductName}/description";
+                string productDescription = File.ReadAllText(Options.ProductDescription);
 
                 // Process the description through the images embedder
                 productDescription = ProcessDescription(productDescription);
@@ -323,16 +321,16 @@ namespace Augurk.CommandLine.Commands
                     var response = client.PutAsync(productUri, new StringContent(productDescription, System.Text.Encoding.UTF8, "text/plain")).Result;
                     if (response.IsSuccessStatusCode)
                     {
-                        Console.WriteLine($"Succesfully published description for product {_options.ProductName} from {_options.ProductDescription}");
+                        Console.WriteLine($"Succesfully published description for product {Options.ProductName} from {Options.ProductDescription}");
                     }
                     else
                     {
-                        Console.WriteLine($"Publishing description for product {_options.ProductName} to {productUri} resulted in status code {response.StatusCode}");
+                        Console.WriteLine($"Publishing description for product {Options.ProductName} to {productUri} resulted in status code {response.StatusCode}");
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.Error.WriteLine($"An error occured while publishing the product description file {_options.ProductDescription}");
+                    Console.Error.WriteLine($"An error occured while publishing the product description file {Options.ProductDescription}");
                     Console.Error.WriteLine(ex.ToString());
                 }
             }
