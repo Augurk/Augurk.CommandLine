@@ -39,9 +39,8 @@ namespace Augurk.CommandLine.Options
         /// <summary>
         /// Gets or sets the name of the product under which the feature files should be published.
         /// </summary>
-        [Option("productName", HelpText = "Name of the product under which the feature files should be published. Cannot be used in combination with the --branchName option.", SetName = "product/branch", Required = false)]
+        [Option("productName", HelpText = "Name of the product under which the feature files should be published. Cannot be used in combination with the --branchName option.", SetName = "product", Required = false)]
         public string ProductName { get; set; }
-
 
         /// <summary>
         /// Gets or sets a value indicating the filename of the Markdown file that should be uploaded as the product page.
@@ -58,19 +57,19 @@ namespace Augurk.CommandLine.Options
         /// <summary>
         /// Gets or sets the name of the branch under which the feature files should be published.
         /// </summary>
-        [Option("branchName", HelpText = "Name of the branch under which the feature files should be published. Cannot be used in combination with the --productName option.", SetName = "product/branch", Required = false)]
+        [Option("branchName", HelpText = "Name of the branch under which the feature files should be published. Cannot be used in combination with the --productName option.", SetName = "branch", Required = false)]
         public string BranchName { get; set; }
 
         /// <summary>
         /// Gets or sets the version of the feature files that are being published.
         /// </summary>
-        [Option("version", HelpText = "Version of the feature files that should be published. Cannot be used in combination with the --clearGroup option.", SetName = "version", Required = false)]
+        [Option("version", HelpText = "Version of the feature files that should be published. Cannot be used in combination with the --clearGroup option.", SetName = "product", Required = false)]
         public string Version { get; set; } = "0.0.0";
 
         /// <summary>
         /// Gets or sets a value indicating whether the group should be cleared prior to publishing the new features.
         /// </summary>
-        [Option("clearGroup", HelpText = "If set the group specified by --groupName will be cleared prior to publishing the new features. Cannot be used in combination with the --version option.", SetName = "version", Required = false)]
+        [Option("clearGroup", HelpText = "If set the group specified by --groupName will be cleared prior to publishing the new features. Cannot be used in combination with the --version option.", SetName = "branch", Required = false)]
         public bool ClearGroup { get; set; }
 
         /// <summary>
