@@ -42,9 +42,6 @@ namespace Augurk.CommandLine
                     errs => -1
                 );
 
-#if DEBUG
-            Console.ReadLine();
-#endif
             Environment.Exit(exitCode);
         }
     }
