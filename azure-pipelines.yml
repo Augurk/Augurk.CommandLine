@@ -89,8 +89,8 @@ jobs:
       inputs:
         rootFolderOrFile: '$(Build.SourcesDirectory)/src/Augurk.CommandLine/bin/$(buildConfiguration)/netcoreapp2.1/osx-x64/publish/'
         includeRootFolder: false
-        archiveType: zip
-        archiveFile: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine-osx-x64-$(Build.BuildNumber).zip'
+        archiveType: tar
+        archiveFile: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine-osx-x64-$(Build.BuildNumber).tar.gz'
 
     - task: PublishBuildArtifacts@1
       inputs:
@@ -131,8 +131,8 @@ jobs:
       inputs:
         rootFolderOrFile: '$(Build.SourcesDirectory)/src/Augurk.CommandLine/bin/$(buildConfiguration)/netcoreapp2.1/linux-x64/publish/'
         includeRootFolder: false
-        archiveType: zip
-        archiveFile: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine-linux-x64-$(Build.BuildNumber).zip'
+        archiveType: tar
+        archiveFile: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine-linux-x64-$(Build.BuildNumber).tar.gz'
 
     - task: PublishBuildArtifacts@1
       inputs:
