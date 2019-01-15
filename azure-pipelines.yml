@@ -19,6 +19,11 @@ jobs:
 
     - task: DotNetCoreCLI@2
       inputs:
+        command: custom
+        arguments: --info
+
+    - task: DotNetCoreCLI@2
+      inputs:
         command: build
         projects: 'src/Augurk.CommandLine/Augurk.CommandLine.csproj'
         arguments: '-r win-x64 -c $(buildConfiguration)'
@@ -82,6 +87,11 @@ jobs:
   steps:
     - task: DotNetCoreCLI@2
       inputs:
+        command: custom
+        arguments: --info
+
+    - task: DotNetCoreCLI@2
+      inputs:
         command: build
         projects: 'src/Augurk.CommandLine/Augurk.CommandLine.csproj'
         arguments: '-r osx-x64 -c $(buildConfiguration)'
@@ -122,6 +132,11 @@ jobs:
     GitVersion.InformationalVersion: $[dependencies.Windows.outputs['setOutputVariables.GitVersion.InformationalVersion']]
     Build.BuildNumber: $[dependencies.Windows.outputs['setOutputVariables.Build.BuildNumber']]
   steps:
+    - task: DotNetCoreCLI@2
+      inputs:
+        command: custom
+        arguments: --info
+
     - task: DotNetCoreCLI@2
       inputs:
         command: build
