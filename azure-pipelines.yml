@@ -36,7 +36,7 @@ jobs:
         versioningScheme: byEnvVar
         versionEnvVar: GitVersion.NuGetVersionV2
         configuration: $(buildConfiguration)
-        
+        verbosityPack: Normal
 
     - task: DotNetCoreCLI@2
       inputs:
@@ -61,7 +61,7 @@ jobs:
 
     - task: PublishBuildArtifacts@1
       inputs:
-        pathtoPublish: '$(Build.SourcesDirectory)\src\Augurk.CommandLine\bin\$(buildConfiguration)\Augurk.CommandLine.$(GitVersion.NuGetVersionV2).nupkg'
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine.$(GitVersion.NuGetVersionV2).nupkg'
         artifactName: NuGetPackages
         publishLocation: Container
 
