@@ -17,10 +17,7 @@ jobs:
       inputs:
         updateAssemblyInfo: true
 
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: custom
-        arguments: --info
+    - script: dotnet --info
 
     - task: DotNetCoreCLI@2
       inputs:
@@ -85,10 +82,7 @@ jobs:
     GitVersion.InformationalVersion: $[dependencies.Windows.outputs['setOutputVariables.GitVersion.InformationalVersion']]
     Build.BuildNumber: $[dependencies.Windows.outputs['setOutputVariables.Build.BuildNumber']]
   steps:
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: custom
-        arguments: --info
+    - script: dotnet --info
 
     - task: DotNetCoreCLI@2
       inputs:
@@ -132,10 +126,7 @@ jobs:
     GitVersion.InformationalVersion: $[dependencies.Windows.outputs['setOutputVariables.GitVersion.InformationalVersion']]
     Build.BuildNumber: $[dependencies.Windows.outputs['setOutputVariables.Build.BuildNumber']]
   steps:
-    - task: DotNetCoreCLI@2
-      inputs:
-        command: custom
-        arguments: --info
+    - script: dotnet --info
 
     - task: DotNetCoreCLI@2
       inputs:
