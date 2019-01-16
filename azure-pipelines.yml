@@ -39,7 +39,7 @@ jobs:
         versionEnvVar: GitVersion.NuGetVersionV2
         configuration: $(buildConfiguration)
         verbosityPack: Normal
-        arguments: '/p:Version=$(GitVersion.MajorMinorPatch) /p:InformationalVersion=$(GitVersion.InformationalVersion)'
+        buildProperties: 'Version=$(GitVersion.MajorMinorPatch);InformationalVersion=$(GitVersion.InformationalVersion)'
 
     - task: DotNetCoreCLI@2
       inputs:
