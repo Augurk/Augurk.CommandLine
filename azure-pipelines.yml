@@ -23,7 +23,7 @@ jobs:
       inputs:
         command: build
         projects: 'src/Augurk.CommandLine/Augurk.CommandLine.csproj'
-        arguments: '-r win-x64 -c $(buildConfiguration)'
+        arguments: '-r win-x64 -c $(buildConfiguration) -p:Version=$(GitVersion.InformationalVersion)'
 
     - task: DotNetCoreCLI@2
       inputs:
@@ -63,7 +63,7 @@ jobs:
 
     - task: PublishBuildArtifacts@1
       inputs:
-        pathtoPublish: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine.$(GitVersion.NuGetVersionV2).nupkg'
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)/Augurk.CLI.$(GitVersion.NuGetVersionV2).nupkg'
         artifactName: NuGetPackages
         publishLocation: Container
 

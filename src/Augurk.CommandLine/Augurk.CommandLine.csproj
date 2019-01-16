@@ -9,8 +9,8 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <PackageId>Augurk.CommandLine</PackageId>
-    <Title>Augurk.CommandLine</Title>
+    <PackageId>Augurk.CLI</PackageId>
+    <Title>Augurk.CLI</Title>
     <Description>A .NET Core Global Tool for interacting with the open source living documentation system Augurk</Description>
     <Authors>Augurk</Authors>
     <PackageTags>augurk .net tool commandline gherkin specflow cucumber</PackageTags>
