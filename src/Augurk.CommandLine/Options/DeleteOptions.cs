@@ -21,6 +21,7 @@ namespace Augurk.CommandLine.Options
     /// <summary>
     /// Represents the available command line options when deleting features.
     /// </summary>
+    [Verb(VERB_NAME, HelpText = "Delete features from Augurk.")]
     internal class DeleteOptions : SharedOptions
     {
         /// <summary>

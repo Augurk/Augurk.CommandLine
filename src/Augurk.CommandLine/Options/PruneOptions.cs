@@ -21,6 +21,7 @@ namespace Augurk.CommandLine.Options
     /// <summary>
     /// Represents the available command line options for the prune command.
     /// </summary>
+    [Verb(VERB_NAME, HelpText = "Prunes specific versions from products in Augurk.")]
     internal class PruneOptions : SharedOptions
     {
         /// <summary>
@@ -43,13 +44,13 @@ namespace Augurk.CommandLine.Options
         /// <summary>
         /// Gets or sets a boolean value indicating whether pre-release versions should be pruned.
         /// </summary>
-        [Option("prerelease", HelpText = "Indicates that pre-release feature versions for which a matching release version exists should be pruned.", MutuallyExclusiveSet = "version", Required = false)]
+        [Option("prerelease", HelpText = "Indicates that pre-release feature versions for which a matching release version exists should be pruned.", SetName = "version", Required = false)]
         public bool PrereleaseOnly { get; set; }
 
         /// <summary>
         /// 'Gets or sets a regular expression that should be run on the feature version in order to determine if it should be pruned.
         /// </summary>
-        [Option("versionRegex", HelpText = "A regular expression that determines the versions that should be pruned.", MutuallyExclusiveSet = "version", Required = false)]
+        [Option("versionRegex", HelpText = "A regular expression that determines the versions that should be pruned.", SetName = "version", Required = false)]
         public string VersionRegex { get; set; }
     }
 }

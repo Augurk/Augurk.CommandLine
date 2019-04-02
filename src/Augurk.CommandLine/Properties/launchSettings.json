@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Augurk.CommandLine": {
+      "commandName": "Project",
+      "commandLineArgs": "publish --featureFiles \"C:\\Projects\\open-source\\Augurk\\Augurk\\\\src\\Augurk.Specifications\\Portal\\Versioned Features\\V2\" --productName Documentation --groupName Portal --version 2.0.0 --url http://localhost:5089/ --useIntegratedSecurity"
+    }
+  }
+}

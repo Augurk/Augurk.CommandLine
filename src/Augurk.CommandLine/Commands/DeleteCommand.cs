@@ -17,92 +17,90 @@
 using Augurk.CommandLine.Options;
 using Augurk.CommandLine.Plumbing;
 using System;
-using System.ComponentModel.Composition;
 
 namespace Augurk.CommandLine.Commands
 {
     /// <summary>
     /// Implements the delete command.
     /// </summary>
-    [Export(typeof(ICommand))]
-    [ExportMetadata("Verb", DeleteOptions.VERB_NAME)]
-    internal class DeleteCommand : ICommand
+    internal class DeleteCommand : BaseCommand<DeleteOptions>
     {
-        private readonly DeleteOptions _options;
-
         /// <summary>
         /// Default constructor for this class.
         /// </summary>
         /// <param name="options">A <see cref="DeleteOptions"/> instance containing the relevant options for the command.</param>
-        [ImportingConstructor]
         public DeleteCommand(DeleteOptions options)
+            : base(options)
         {
-            _options = options;
         }
 
         /// <summary>
         /// Called when the command is to be executed.
         /// </summary>
-        public void Execute()
+        protected override int ExecuteCore()
         {
             // Determine the base Uri we're going to perform the delete on
-            var baseUri = new Uri($"{_options.AugurkUrl}/api/v2/products/{_options.ProductName}/");
+            var baseUri = new Uri($"{Options.AugurkUrl}/api/v2/products/{Options.ProductName}/");
             var deleteUri = baseUri;
 
             // If a group name is specified
-            if (!String.IsNullOrWhiteSpace(_options.GroupName))
+            if (!String.IsNullOrWhiteSpace(Options.GroupName))
             {
                 // Append it to the base uri
-                deleteUri = new Uri(deleteUri, $"groups/{_options.GroupName}/");
+                deleteUri = new Uri(deleteUri, $"groups/{Options.GroupName}/");
             }
 
             // If a feature name is specified
-            if (!String.IsNullOrWhiteSpace(_options.FeatureName))
+            if (!String.IsNullOrWhiteSpace(Options.FeatureName))
             {
                 // Make sure that the group name is also specified
-                if (String.IsNullOrWhiteSpace(_options.GroupName))
+                if (String.IsNullOrWhiteSpace(Options.GroupName))
                 {
                     Console.WriteLine("When deleting a specific feature a group name that the feature belongs to must also be specified.");
-                    return;
+                    return -1;
                 }
 
                 // Append the feature name to the base uri
-                deleteUri = new Uri(deleteUri, $"features/{_options.FeatureName}/");
+                deleteUri = new Uri(deleteUri, $"features/{Options.FeatureName}/");
             }
 
             // If a version is specified
-            if (!String.IsNullOrWhiteSpace(_options.Version))
+            if (!String.IsNullOrWhiteSpace(Options.Version))
             {
                 // Append the version to the base uri
-                deleteUri = new Uri(deleteUri, $"versions/{_options.Version}/");
+                deleteUri = new Uri(deleteUri, $"versions/{Options.Version}/");
             }
 
             // Perform the delete operation
-            using (var client = AugurkHttpClientFactory.CreateHttpClient(_options))
+            using (var client = AugurkHttpClientFactory.CreateHttpClient(Options))
             {
                 // Call the URL
                 var response = client.DeleteAsync(deleteUri).Result;
                 if (response.IsSuccessStatusCode)
                 {
-                    if (!String.IsNullOrWhiteSpace(_options.FeatureName))
+                    if (!String.IsNullOrWhiteSpace(Options.FeatureName))
                     {
-                        Console.WriteLine($"Succesfully deleted feature {_options.FeatureName} from Augurk at {_options.AugurkUrl}");
+                        Console.WriteLine($"Succesfully deleted feature {Options.FeatureName} from Augurk at {Options.AugurkUrl}");
                     }
                     else
                     {
-                        Console.WriteLine($"Succesfully deleted features from Augurk at {_options.AugurkUrl}");
+                        Console.WriteLine($"Succesfully deleted features from Augurk at {Options.AugurkUrl}");
                     }
+
+                    return 0;
                 }
                 else
                 {
-                    if (!String.IsNullOrWhiteSpace(_options.FeatureName))
+                    if (!String.IsNullOrWhiteSpace(Options.FeatureName))
                     {
-                        Console.WriteLine($"Deleting feature {_options.FeatureName} from Augurk at {_options.AugurkUrl} failed with statuscode {response.StatusCode}");
+                        Console.WriteLine($"Deleting feature {Options.FeatureName} from Augurk at {Options.AugurkUrl} failed with statuscode {response.StatusCode}");
                     }
                     else
                     {
-                        Console.WriteLine($"Deleting features from Augurk at {_options.AugurkUrl} failed with statuscode {response.StatusCode}");
+                        Console.WriteLine($"Deleting features from Augurk at {Options.AugurkUrl} failed with statuscode {response.StatusCode}");
                     }
+
+                    return -1;
                 }
             }
         }

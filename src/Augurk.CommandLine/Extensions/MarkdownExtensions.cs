@@ -21,6 +21,8 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Formats;
 
 namespace Augurk.CommandLine.Extensions
 {
@@ -46,34 +48,37 @@ namespace Augurk.CommandLine.Extensions
 
             // Set up some general variables
             int offset = 0;
-            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageEncoders();
-
             while (match.Success)
             {
                 Group fileGroup = match.Groups["file"];
 
+                string path = Path.Join(Environment.CurrentDirectory, fileGroup.Value);
                 if (File.Exists(fileGroup.Value))
                 {
-                    Image image = Image.FromFile(fileGroup.Value);
-
-                    // Determine the mimetype
-                    string mimeType = codecs.First(codec => codec.FormatID == image.RawFormat.Guid).MimeType;
-
-                    using (var ms = new MemoryStream())
+                    using (var image = Image.Load(fileGroup.Value, out IImageFormat format))
                     {
-                        // Save the image in a stream so we can convert it to a string
-                        image.Save(ms, image.RawFormat);
+                        // Determine the mimetype
+                        using (var ms = new MemoryStream())
+                        {
+                            // Save the image in a stream so we can convert it to a string
+                            image.Save(ms, format);
 
-                        // Use the data URI syntax (RFC 2397)
-                        string encodedFile = $"data:{mimeType};base64,{Convert.ToBase64String(ms.ToArray())}";
+                            // Use the data URI syntax (RFC 2397)
+                            string encodedFile = $"data:{format.DefaultMimeType};base64,{Convert.ToBase64String(ms.ToArray())}";
 
-                        // Replace the original filename with the encoded file
-                        resultMarkdown = $"{resultMarkdown.Substring(0, fileGroup.Index + offset)}{encodedFile}{resultMarkdown.Substring(fileGroup.Index + fileGroup.Length + offset)}";
+                            // Replace the original filename with the encoded file
+                            resultMarkdown = $"{resultMarkdown.Substring(0, fileGroup.Index + offset)}{encodedFile}{resultMarkdown.Substring(fileGroup.Index + fileGroup.Length + offset)}";
 
-                        // Determine the change in length of the file, to use as offset for following matches
-                        offset += encodedFile.Length - fileGroup.Length;
+                            // Determine the change in length of the file, to use as offset for following matches
+                            offset += encodedFile.Length - fileGroup.Length;
+                        }
                     }
                 }
+                else
+                {
+                    Console.WriteLine($"warning: Unable to find referenced image {path}");
+                }
+
                 // Move to the next match
                 match = match.NextMatch();
             }
