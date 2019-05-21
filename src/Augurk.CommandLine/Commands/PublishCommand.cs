@@ -110,6 +110,7 @@ namespace Augurk.CommandLine.Commands
                         else
                         {
                             WriteUnsuccesfulPublishMessage(usev2api, targetUri, feature, response);
+                            return -1;
                         }
                     }
                     catch (CompositeParserException)
