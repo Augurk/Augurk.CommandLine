@@ -88,7 +88,7 @@ namespace Augurk.CommandLine.Commands
                 }
 
                 // Parse and publish each of the provided feature files
-                var expandedList = Expand(Options.FeatureFiles);
+                var expandedList = Expand(Options.FeatureFiles, Options.Recursive);
                 foreach (var featureFile in expandedList)
                 {
                     try
@@ -212,7 +212,7 @@ namespace Augurk.CommandLine.Commands
         /// </remarks>
         /// <param name="featureFiles">List of feature files specified by the user.</param>
         /// <returns>Expanded set of file names.</returns>
-        private static IEnumerable<string> Expand(IEnumerable<string> featureFiles)
+        private static IEnumerable<string> Expand(IEnumerable<string> featureFiles, bool recursive)
         {
             var expandedList = new List<string>();
 
@@ -221,7 +221,8 @@ namespace Augurk.CommandLine.Commands
                 if (Directory.Exists(fileSpec))
                 {
                     // spec is a directory, automatically expand to *.feature
-                    var files = Directory.GetFiles(fileSpec, "*.feature");
+                    var searchOption = (recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+                    var files = Directory.GetFiles(fileSpec, "*.feature", searchOption);
                     expandedList.AddRange(files);
                     continue;
                 }
