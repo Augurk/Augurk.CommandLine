@@ -137,13 +137,14 @@ namespace Augurk.CommandLine.Commands
         /// <returns>Returns a string containing the Uri to the group where features should be uploaded to.</returns>
         private string GetGroupUri(bool usev2api)
         {
+            string encodedGroupName = Uri.EscapeDataString(Options.GroupName);
             if (usev2api)
             {
-                return $"{Options.AugurkUrl.TrimEnd('/')}/api/v2/products/{Options.ProductName}/groups/{Options.GroupName}/features";
+                return $"{Options.AugurkUrl.TrimEnd('/')}/api/v2/products/{Options.ProductName}/groups/{encodedGroupName}/features";
             }
             else
             {
-                return $"{Options.AugurkUrl.TrimEnd('/')}/api/features/{Options.BranchName}/{Options.GroupName ?? "Default"}";
+                return $"{Options.AugurkUrl.TrimEnd('/')}/api/features/{Options.BranchName}/{encodedGroupName ?? "Default"}";
             }
         }
 
@@ -156,13 +157,14 @@ namespace Augurk.CommandLine.Commands
         /// <returns>Returns a string containing the Uri to the feature file.</returns>
         private string GetTargetUri(bool usev2api, string groupUri, Feature feature)
         {
+            var encodedFeatureTitle = Uri.EscapeDataString(feature.Title);
             if (usev2api)
             {
-                return $"{groupUri}/{feature.Title}/versions/{Options.Version}/";
+                return $"{groupUri}/{encodedFeatureTitle}/versions/{Options.Version}/";
             }
             else
             {
-                return $"{groupUri}/{feature.Title}";
+                return $"{groupUri}/{encodedFeatureTitle}";
             }
         }
 
@@ -291,9 +293,9 @@ namespace Augurk.CommandLine.Commands
 
         private string ProcessDescription(string originalDescription)
         {
-            if (String.IsNullOrEmpty(originalDescription)) 
-            { 
-                return originalDescription; 
+            if (String.IsNullOrEmpty(originalDescription))
+            {
+                return originalDescription;
             }
 
             string result = originalDescription;
