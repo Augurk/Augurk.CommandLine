@@ -113,6 +113,11 @@ namespace Augurk.CommandLine.Commands
                             return -1;
                         }
                     }
+                    catch (InvalidOperationException)
+                    {
+                        Console.Error.WriteLine($"Unable to parse feature file '{featureFile}'. Possible causes are that the feature file is commented out entirely.");
+                        return -1;
+                    }
                     catch (CompositeParserException)
                     {
                         Console.Error.WriteLine($"Unable to parse feature file '{featureFile}'. Are you missing a language comment or --language option?");
@@ -275,6 +280,11 @@ namespace Augurk.CommandLine.Commands
                 var tokenScanner = new TokenScanner(reader);
                 var tokenMatcher = new TokenMatcher(dialectProvider);
                 var document = parser.Parse(tokenScanner, tokenMatcher);
+                if (document.Feature == null)
+                {
+                    throw new InvalidOperationException("Feature file failed to parse.");
+                }
+
                 var feature = document.Feature.ConvertToFeature(dialectProvider.GetDialect(document.Feature.Language, document.Feature.Location));
                 feature.SourceFilename = featureFile;
 
