@@ -20,11 +20,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CommandLineParser" Version="2.4.3" />
-    <PackageReference Include="Gherkin" Version="5.1.0" />
+    <PackageReference Include="CommandLineParser" Version="2.5.0" />
+    <PackageReference Include="Gherkin" Version="6.0.0" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="Sixlabors.ImageSharp" Version="1.0.0-beta0005" />
+    <PackageReference Include="Sixlabors.ImageSharp" Version="1.0.0-beta0006" />
     <PackageReference Include="System.Security.Principal.Windows" Version="4.5.1" />
   </ItemGroup>
 </Project>

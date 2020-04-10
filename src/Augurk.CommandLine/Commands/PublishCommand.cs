@@ -247,9 +247,15 @@ namespace Augurk.CommandLine.Commands
                     continue;
                 }
 
-                if (File.Exists(fileSpec))
+                string filePath = fileSpec;
+                if (!Path.IsPathRooted(fileSpec))
                 {
-                    expandedList.Add(fileSpec);
+                    filePath = Path.Combine(Environment.CurrentDirectory, fileSpec);
+                }
+
+                if (File.Exists(filePath))
+                {
+                    expandedList.Add(filePath);
                 }
                 else
                 {
