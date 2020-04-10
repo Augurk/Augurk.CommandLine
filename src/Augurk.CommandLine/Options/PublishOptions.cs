@@ -37,6 +37,12 @@ namespace Augurk.CommandLine.Options
         public IEnumerable<string> FeatureFiles { get; set; }
 
         /// <summary>
+        /// Gets or sets the set of comma separated .feature file or directory specifications that should be published to Augurk.
+        /// </summary>
+        [Option("recursive", HelpText = "Indicates whether directory specifications should be loaded recursively", Required = false)]        
+        public bool Recursive { get; set; }
+
+        /// <summary>
         /// Gets or sets the name of the product under which the feature files should be published.
         /// </summary>
         [Option("productName", HelpText = "Name of the product under which the feature files should be published. Cannot be used in combination with the --branchName option.", SetName = "product", Required = false)]
