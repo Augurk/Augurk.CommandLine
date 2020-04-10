@@ -45,6 +45,6 @@ jobs:
     - task: PublishBuildArtifacts@1
       displayName: 'Publish NuGet package'
       inputs:
-        pathtoPublish: '$(Build.ArtifactStagingDirectory)/Augurk.CLI.$(GitVersion.FullSemVer).nupkg'
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)/*.nupkg'
         artifactName: NuGetPackages
         publishLocation: Container
