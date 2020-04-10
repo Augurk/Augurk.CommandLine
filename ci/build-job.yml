@@ -1,0 +1,70 @@
+parameters:
+- name: vmImage
+  type: string
+- name: dotnetSdk
+  type: string
+  defaultValue: 2.1.505
+- name: buildConfiguration
+  type: string
+  defaultValue: Release
+- name: targetFramework
+  type: string
+  defaultValue: netcoreapp2.1
+- name: runtimeIdentifier
+  type: string
+- name: jobName
+  type: string
+
+- job: ${{ parameters.jobName }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+  steps:
+    - task: UseDotNet@2
+      displayName: 'Use .NET Core sdk'
+      inputs:
+        packageType: sdk
+        version: ${{ parameters.dotnetSdk }}
+        installationPath: $(Agent.ToolsDirectory)/dotnet
+
+    - task: GitVersion@5
+      displayName: 'Determine version'
+      inputs:
+        updateAssemblyInfo: true
+
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet build'
+      inputs:
+        command: build
+        projects: 'src/Augurk.CommandLine/Augurk.CommandLine.csproj'
+        arguments: '-r ${{ parameters.runtimeIdentifier }} -c ${{ parameters.buildConfiguration }'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet test'
+      inputs:
+        command: test
+        projects: 'src/Augurk.CommandLine.UnitTest/Augurk.CommandLine.UnitTest.csproj'
+        continueOnError: true
+
+    - task: DotNetCoreCLI@2
+      displayName: 'dotnet publish'
+      inputs:
+        command: publish
+        projects: 'src/Augurk.CommandLine/Augurk.CommandLine.csproj'
+        arguments: '-r ${{ parameters.runtime-identifier }} -c ${{ parameters.buildConfiguration }} /p:Version=$(GitVersion.MajorMinorPatch) /p:InformationalVersion=$(GitVersion.InformationalVersion)'
+        zipAfterPublish: false
+        publishWebProjects: false
+
+    - task: ArchiveFiles@2
+      displayName: 'Tar self-contained'
+      inputs:
+        rootFolderOrFile: '$(Build.SourcesDirectory)/src/Augurk.CommandLine/bin/${{ parameters.buildConfiguration }}/${{ parameters.targetFramework }}/${{ parameters.runtimeIdentifier }}/publish/'
+        includeRootFolder: false
+        archiveType: tar
+        archiveFile: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine-${{ parameters.runtimeIdentifier }}-$(Build.BuildNumber).tar.gz'
+
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publish self-contained'
+      inputs:
+        pathToPublish: '$(Build.ArtifactStagingDirectory)'
+        artifactName: ${{ parameters.jobName }}
+        publishLocation: Container
