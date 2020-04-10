@@ -37,7 +37,7 @@ jobs:
       inputs:
         command: build
         projects: 'src/Augurk.CommandLine/Augurk.CommandLine.csproj'
-        arguments: '-r ${{ parameters.runtimeIdentifier }} -c ${{ parameters.buildConfiguration }'
+        arguments: '-r ${{ parameters.runtimeIdentifier }} -c ${{ parameters.buildConfiguration }}'
 
     - task: DotNetCoreCLI@2
       displayName: 'dotnet test'
@@ -51,7 +51,7 @@ jobs:
       inputs:
         command: publish
         projects: 'src/Augurk.CommandLine/Augurk.CommandLine.csproj'
-        arguments: '-r ${{ parameters.runtime-identifier }} -c ${{ parameters.buildConfiguration }} /p:Version=$(GitVersion.MajorMinorPatch) /p:InformationalVersion=$(GitVersion.InformationalVersion)'
+        arguments: '-r ${{ parameters.runtimeIdentifier }} -c ${{ parameters.buildConfiguration }} /p:Version=$(GitVersion.MajorMinorPatch) /p:InformationalVersion=$(GitVersion.InformationalVersion)'
         zipAfterPublish: false
         publishWebProjects: false
 
