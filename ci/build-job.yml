@@ -3,13 +3,13 @@ parameters:
   type: string
 - name: dotnetSdk
   type: string
-  defaultValue: 2.1.505
+  default: 2.1.505
 - name: buildConfiguration
   type: string
-  defaultValue: Release
+  default: Release
 - name: targetFramework
   type: string
-  defaultValue: netcoreapp2.1
+  default: netcoreapp2.1
 - name: runtimeIdentifier
   type: string
 - name: jobName
