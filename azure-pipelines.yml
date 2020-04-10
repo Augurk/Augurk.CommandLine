@@ -79,7 +79,7 @@ jobs:
 
 - job: macOS
   pool:
-    vmImage: macOS-10.13
+    vmImage: macOS-10.15
   steps:
     - task: GitVersion@5
       displayName: 'Determine version'
