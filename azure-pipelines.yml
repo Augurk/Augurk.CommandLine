@@ -13,7 +13,7 @@ jobs:
   pool:
     vmImage: 'VS2017-Win2016'
   steps:
-    - task: GitVersion@4
+    - task: GitVersion@5
       displayName: 'Determine version'
       inputs:
         updateAssemblyInfo: true
@@ -77,20 +77,15 @@ jobs:
         artifactName: Windows
         publishLocation: Container
 
-    - powershell: |
-        echo "##vso[task.setvariable variable=GitVersion.MajorMinorPatch;isOutput=true]$(GitVersion.MajorMinorPatch)"
-        echo "##vso[task.setvariable variable=GitVersion.InformationalVersion;isOutput=true]$(GitVersion.InformationalVersion)"
-      name: setOutputVariables
-      displayName: 'Set output variables (for subsequent phases)'
-
 - job: macOS
-  dependsOn: Windows # For now, since we can't run GitVersion on macOS
   pool:
     vmImage: macOS-10.13
-  variables:
-    GitVersion.MajorMinorPatch: $[dependencies.Windows.outputs['setOutputVariables.GitVersion.MajorMinorPatch']]
-    GitVersion.InformationalVersion: $[dependencies.Windows.outputs['setOutputVariables.GitVersion.InformationalVersion']]
   steps:
+    - task: GitVersion@5
+      displayName: 'Determine version'
+      inputs:
+        updateAssemblyInfo: true
+
     - script: dotnet --info
       displayName: 'dotnet --info'
 
@@ -133,13 +128,14 @@ jobs:
         publishLocation: Container
 
 - job: Linux
-  dependsOn: Windows # For now, since we can't run GitVersion on macOS
   pool:
     vmImage: ubuntu-16.04
-  variables:
-    GitVersion.MajorMinorPatch: $[dependencies.Windows.outputs['setOutputVariables.GitVersion.MajorMinorPatch']]
-    GitVersion.InformationalVersion: $[dependencies.Windows.outputs['setOutputVariables.GitVersion.InformationalVersion']]
   steps:
+    - task: GitVersion@5
+      displayName: 'Determine version'
+      inputs:
+        updateAssemblyInfo: true
+
     - script: dotnet --info
       displayName: 'dotnet --info'
 
