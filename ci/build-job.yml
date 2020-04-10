@@ -15,6 +15,7 @@ parameters:
 - name: jobName
   type: string
 
+jobs:
 - job: ${{ parameters.jobName }}
   pool:
     vmImage: ${{ parameters.vmImage }}
