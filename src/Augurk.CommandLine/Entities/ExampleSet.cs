@@ -42,10 +42,5 @@ namespace Augurk.CommandLine.Entities
         /// Gets or sets the tags of this example set.
         /// </summary>
         public IEnumerable<string> Tags { get; set; }
-
-        /// <summary>
-        /// Gets or sets the <see cref="SourceLocation"/> of this example set.
-        /// </summary>
-        public SourceLocation Location { get; set; }
     }
 }
