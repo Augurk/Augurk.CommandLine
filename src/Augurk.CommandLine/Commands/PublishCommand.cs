@@ -115,13 +115,11 @@ namespace Augurk.CommandLine.Commands
                     }
                     catch (InvalidOperationException)
                     {
-                        Console.Error.WriteLine($"Unable to parse feature file '{featureFile}'. Possible causes are that the feature file is commented out entirely.");
-                        return -1;
+                        Console.Out.WriteLine($"WARNING: Unable to parse feature file '{featureFile}' since it doesn't contain any Gherkin content.");
                     }
                     catch (CompositeParserException)
                     {
-                        Console.Error.WriteLine($"Unable to parse feature file '{featureFile}'. Are you missing a language comment or --language option?");
-                        return -1;
+                        Console.Out.WriteLine($"WARNING: Unable to parse feature file '{featureFile}'. Are you missing a language comment or --language option?");
                     }
                     catch (Exception e)
                     {
