@@ -37,7 +37,7 @@ jobs:
         command: pack
         projects: 'src/Augurk.CommandLine/Augurk.CommandLine.csproj'
         versioningScheme: byEnvVar
-        versionEnvVar: GitVersion.NuGetVersionV2
+        versionEnvVar: GitVersion.FullSemVer
         configuration: $(buildConfiguration)
         verbosityPack: Normal
         buildProperties: 'Version=$(GitVersion.MajorMinorPatch);InformationalVersion=$(GitVersion.InformationalVersion)'
@@ -45,6 +45,6 @@ jobs:
     - task: PublishBuildArtifacts@1
       displayName: 'Publish NuGet package'
       inputs:
-        pathtoPublish: '$(Build.ArtifactStagingDirectory)/Augurk.CLI.$(GitVersion.NuGetVersionV2).nupkg'
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)/Augurk.CLI.$(GitVersion.FullSemVer).nupkg'
         artifactName: NuGetPackages
         publishLocation: Container
