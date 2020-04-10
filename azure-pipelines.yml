@@ -80,7 +80,6 @@ jobs:
     - powershell: |
         echo "##vso[task.setvariable variable=GitVersion.MajorMinorPatch;isOutput=true]$(GitVersion.MajorMinorPatch)"
         echo "##vso[task.setvariable variable=GitVersion.InformationalVersion;isOutput=true]$(GitVersion.InformationalVersion)"
-        echo "##vso[task.setvariable variable=Build.BuildNumber;isOutput=true]$(Build.BuildNumber)"
       name: setOutputVariables
       displayName: 'Set output variables (for subsequent phases)'
 
@@ -91,7 +90,6 @@ jobs:
   variables:
     GitVersion.MajorMinorPatch: $[dependencies.Windows.outputs['setOutputVariables.GitVersion.MajorMinorPatch']]
     GitVersion.InformationalVersion: $[dependencies.Windows.outputs['setOutputVariables.GitVersion.InformationalVersion']]
-    Build.BuildNumber: $[dependencies.Windows.outputs['setOutputVariables.Build.BuildNumber']]
   steps:
     - script: dotnet --info
       displayName: 'dotnet --info'
@@ -141,7 +139,6 @@ jobs:
   variables:
     GitVersion.MajorMinorPatch: $[dependencies.Windows.outputs['setOutputVariables.GitVersion.MajorMinorPatch']]
     GitVersion.InformationalVersion: $[dependencies.Windows.outputs['setOutputVariables.GitVersion.InformationalVersion']]
-    Build.BuildNumber: $[dependencies.Windows.outputs['setOutputVariables.Build.BuildNumber']]
   steps:
     - script: dotnet --info
       displayName: 'dotnet --info'
