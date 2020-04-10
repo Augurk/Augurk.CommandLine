@@ -13,13 +13,13 @@ jobs:
   pool:
     vmImage: 'VS2017-Win2016'
   steps:
+    - script: dotnet --info
+      displayName: 'dotnet --info'
+
     - task: GitVersion@5
       displayName: 'Determine version'
       inputs:
         updateAssemblyInfo: true
-
-    - script: dotnet --info
-      displayName: 'dotnet --info'
 
     - task: DotNetCoreCLI@2
       displayName: 'dotnet build'
@@ -81,13 +81,13 @@ jobs:
   pool:
     vmImage: macOS-10.15
   steps:
+    - script: dotnet --info
+      displayName: 'dotnet --info'
+
     - task: GitVersion@5
       displayName: 'Determine version'
       inputs:
         updateAssemblyInfo: true
-
-    - script: dotnet --info
-      displayName: 'dotnet --info'
 
     - task: DotNetCoreCLI@2
       displayName: 'dotnet build'
@@ -131,13 +131,13 @@ jobs:
   pool:
     vmImage: ubuntu-16.04
   steps:
+    - script: dotnet --info
+      displayName: 'dotnet --info'
+
     - task: GitVersion@5
       displayName: 'Determine version'
       inputs:
         updateAssemblyInfo: true
-
-    - script: dotnet --info
-      displayName: 'dotnet --info'
 
     - task: DotNetCoreCLI@2
       displayName: 'dotnet build'
