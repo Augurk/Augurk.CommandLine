@@ -38,7 +38,7 @@ jobs:
         projects: 'src/Augurk.CommandLine/Augurk.CommandLine.csproj'
         versioningScheme: byEnvVar
         versionEnvVar: GitVersion.NuGetVersionV2
-        configuration: $(buildConfiguration)
+        configuration: Release
         verbosityPack: Normal
         buildProperties: 'Version=$(GitVersion.MajorMinorPatch);InformationalVersion=$(GitVersion.InformationalVersion)'
 
