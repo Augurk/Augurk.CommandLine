@@ -3,7 +3,7 @@ mode: Mainline
 branches:
   feature:
     regex: ^features?[/-]
-    mode: ContinuousDelivery
+    mode: Mainline
     tag: useBranchName
     increment: Inherit
     prevent-increment-of-merged-branch-version: false
