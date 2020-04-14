@@ -61,7 +61,7 @@ jobs:
         rootFolderOrFile: '$(Build.SourcesDirectory)/src/Augurk.CommandLine/bin/${{ parameters.buildConfiguration }}/${{ parameters.targetFramework }}/${{ parameters.runtimeIdentifier }}/publish/'
         includeRootFolder: false
         archiveType: tar
-        archiveFile: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine-${{ parameters.runtimeIdentifier }}-$(Build.BuildNumber).tar.gz'
+        archiveFile: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine-${{ parameters.runtimeIdentifier }}-$(GitVersion.SemVer).tar.gz'
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish self-contained'
