@@ -67,9 +67,9 @@ jobs:
         rootFolderOrFile: '$(Build.SourcesDirectory)/src/Augurk.CommandLine/bin/${{ parameters.buildConfiguration }}/${{ parameters.targetFramework }}/${{ parameters.runtimeIdentifier }}/publish/'
         includeRootFolder: false
         archiveType: ${{ parameters.archiveType }}
-        ${{ if eq(parameters.archiveType, tar) }}:
+        ${{ if eq(parameters.archiveType, 'tar') }}:
           archiveFile: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine-${{ parameters.runtimeIdentifier }}-$(Build.BuildNumber).tar.gz'
-        ${{ if eq(parameters.archiveType, zip) }}:
+        ${{ if eq(parameters.archiveType, 'zip') }}:
           archiveFile: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine-${{ parameters.runtimeIdentifier }}-$(Build.BuildNumber).zip'
 
     - task: PublishBuildArtifacts@1
