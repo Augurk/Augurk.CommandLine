@@ -14,6 +14,12 @@ parameters:
   type: string
 - name: jobName
   type: string
+- name: archiveType
+  type: string
+  default: tar
+  values:
+  - tar
+  - zip
 
 jobs:
 - job: ${{ parameters.jobName }}
@@ -60,8 +66,11 @@ jobs:
       inputs:
         rootFolderOrFile: '$(Build.SourcesDirectory)/src/Augurk.CommandLine/bin/${{ parameters.buildConfiguration }}/${{ parameters.targetFramework }}/${{ parameters.runtimeIdentifier }}/publish/'
         includeRootFolder: false
-        archiveType: tar
-        archiveFile: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine-${{ parameters.runtimeIdentifier }}-$(Build.BuildNumber).tar.gz'
+        archiveType: ${{ parameters.archiveType }}
+        ${{ if eq(parameters.archiveType, tar) }}:
+          archiveFile: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine-${{ parameters.runtimeIdentifier }}-$(Build.BuildNumber).tar.gz'
+        ${{ if eq(parameters.archiveType, zip) }}:
+          archiveFile: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine-${{ parameters.runtimeIdentifier }}-$(Build.BuildNumber).zip'
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish self-contained'

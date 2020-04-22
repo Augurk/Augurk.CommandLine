@@ -6,6 +6,7 @@ jobs:
     vmImage: VS2017-Win2016
     runtimeIdentifier: win-x64
     jobName: Windows
+    archiveType: zip
 
 - template: ci/build-job.yml
   parameters:
