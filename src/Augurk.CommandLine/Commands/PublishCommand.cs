@@ -1,5 +1,5 @@
 ﻿/*
- Copyright 2017, Augurk
+ Copyright 2017-2020, Augurk
  
  Licensed under the Apache License, Version 2.0 (the "License");
  you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ namespace Augurk.CommandLine.Commands
                 }
 
                 // Parse and publish each of the provided feature files
-                var expandedList = Expand(Options.FeatureFiles);
+                var expandedList = Expand(Options.FeatureFiles, Options.Recursive);
                 foreach (var featureFile in expandedList)
                 {
                     try
@@ -113,10 +113,13 @@ namespace Augurk.CommandLine.Commands
                             return -1;
                         }
                     }
+                    catch (InvalidOperationException)
+                    {
+                        Console.Out.WriteLine($"WARNING: Unable to parse feature file '{featureFile}' since it doesn't contain any Gherkin content.");
+                    }
                     catch (CompositeParserException)
                     {
-                        Console.Error.WriteLine($"Unable to parse feature file '{featureFile}'. Are you missing a language comment or --language option?");
-                        return -1;
+                        Console.Out.WriteLine($"WARNING: Unable to parse feature file '{featureFile}'. Are you missing a language comment or --language option?");
                     }
                     catch (Exception e)
                     {
@@ -137,13 +140,14 @@ namespace Augurk.CommandLine.Commands
         /// <returns>Returns a string containing the Uri to the group where features should be uploaded to.</returns>
         private string GetGroupUri(bool usev2api)
         {
+            string encodedGroupName = Uri.EscapeDataString(Options.GroupName);
             if (usev2api)
             {
-                return $"{Options.AugurkUrl.TrimEnd('/')}/api/v2/products/{Options.ProductName}/groups/{Options.GroupName}/features";
+                return $"{Options.AugurkUrl.TrimEnd('/')}/api/v2/products/{Options.ProductName}/groups/{encodedGroupName}/features";
             }
             else
             {
-                return $"{Options.AugurkUrl.TrimEnd('/')}/api/features/{Options.BranchName}/{Options.GroupName ?? "Default"}";
+                return $"{Options.AugurkUrl.TrimEnd('/')}/api/features/{Options.BranchName}/{encodedGroupName ?? "Default"}";
             }
         }
 
@@ -156,13 +160,14 @@ namespace Augurk.CommandLine.Commands
         /// <returns>Returns a string containing the Uri to the feature file.</returns>
         private string GetTargetUri(bool usev2api, string groupUri, Feature feature)
         {
+            var encodedFeatureTitle = Uri.EscapeDataString(feature.Title);
             if (usev2api)
             {
-                return $"{groupUri}/{feature.Title}/versions/{Options.Version}/";
+                return $"{groupUri}/{encodedFeatureTitle}/versions/{Options.Version}/";
             }
             else
             {
-                return $"{groupUri}/{feature.Title}";
+                return $"{groupUri}/{encodedFeatureTitle}";
             }
         }
 
@@ -212,7 +217,7 @@ namespace Augurk.CommandLine.Commands
         /// </remarks>
         /// <param name="featureFiles">List of feature files specified by the user.</param>
         /// <returns>Expanded set of file names.</returns>
-        private static IEnumerable<string> Expand(IEnumerable<string> featureFiles)
+        private static IEnumerable<string> Expand(IEnumerable<string> featureFiles, bool recursive)
         {
             var expandedList = new List<string>();
 
@@ -221,7 +226,8 @@ namespace Augurk.CommandLine.Commands
                 if (Directory.Exists(fileSpec))
                 {
                     // spec is a directory, automatically expand to *.feature
-                    var files = Directory.GetFiles(fileSpec, "*.feature");
+                    var searchOption = (recursive ? SearchOption.AllDirectories : SearchOption.TopDirectoryOnly);
+                    var files = Directory.GetFiles(fileSpec, "*.feature", searchOption);
                     expandedList.AddRange(files);
                     continue;
                 }
@@ -247,9 +253,15 @@ namespace Augurk.CommandLine.Commands
                     continue;
                 }
 
-                if (File.Exists(fileSpec))
+                string filePath = fileSpec;
+                if (!Path.IsPathRooted(fileSpec))
                 {
-                    expandedList.Add(fileSpec);
+                    filePath = Path.Combine(Environment.CurrentDirectory, fileSpec);
+                }
+
+                if (File.Exists(filePath))
+                {
+                    expandedList.Add(filePath);
                 }
                 else
                 {
@@ -269,6 +281,11 @@ namespace Augurk.CommandLine.Commands
                 var tokenScanner = new TokenScanner(reader);
                 var tokenMatcher = new TokenMatcher(dialectProvider);
                 var document = parser.Parse(tokenScanner, tokenMatcher);
+                if (document.Feature == null)
+                {
+                    throw new InvalidOperationException("Feature file failed to parse.");
+                }
+
                 var feature = document.Feature.ConvertToFeature(dialectProvider.GetDialect(document.Feature.Language, document.Feature.Location));
                 feature.SourceFilename = featureFile;
 
@@ -291,9 +308,9 @@ namespace Augurk.CommandLine.Commands
 
         private string ProcessDescription(string originalDescription)
         {
-            if (String.IsNullOrEmpty(originalDescription)) 
-            { 
-                return originalDescription; 
+            if (String.IsNullOrEmpty(originalDescription))
+            {
+                return originalDescription;
             }
 
             string result = originalDescription;

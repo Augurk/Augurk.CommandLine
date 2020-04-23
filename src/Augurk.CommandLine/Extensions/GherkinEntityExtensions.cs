@@ -41,7 +41,7 @@ namespace Augurk.CommandLine.Entities
             }
 
             var background = feature.Children.OfType<Gherkin.Ast.Background>().FirstOrDefault();
-            var scenarios = feature.Children.Where(definition => !(definition is Gherkin.Ast.Background));
+            var scenarios = feature.Children.OfType<Gherkin.Ast.Scenario>();
 
             return new Feature()
             {
@@ -86,25 +86,17 @@ namespace Augurk.CommandLine.Entities
         }
 
         /// <summary>
-        /// Converts the provided <see cref="Gherkin.Ast.ScenarioDefinition"/> instance into a <see cref="Augurk.Entities.Scenario"/> instance.
+        /// Converts the provided <see cref="Gherkin.Ast.Scenario"/> instance into a <see cref="Augurk.Entities.Scenario"/> instance.
         /// </summary>
-        /// <param name="scenarioDefinition">The <see cref="Gherkin.Ast.ScenarioDefinition"/> instance that should be converted.</param>
+        /// <param name="scenario">The <see cref="Gherkin.Ast.Scenario"/> instance that should be converted.</param>
         /// <param name="dialect">The <see cref="GherkinDialect"/> that is being used for this feature.</param>
         /// <returns>The converted <see cref="Augurk.Entities.Scenario"/> instance.</returns>
-        public static Scenario ConvertToScenario(this Gherkin.Ast.ScenarioDefinition scenarioDefinition, GherkinDialect dialect)
+        public static Scenario ConvertToScenario(this Gherkin.Ast.Scenario scenario, GherkinDialect dialect)
         {
-            if (scenarioDefinition == null)
+            if (scenario == null)
             {
-                throw new ArgumentNullException("scenario");
+                throw new ArgumentNullException(nameof(scenario));
             }
-
-            Gherkin.Ast.ScenarioOutline outline = scenarioDefinition as Gherkin.Ast.ScenarioOutline;
-            if (outline != null)
-            {
-                return outline.ConvertToScenario(dialect);
-            }
-
-            Gherkin.Ast.Scenario scenario = scenarioDefinition as Gherkin.Ast.Scenario;
 
             return new Scenario()
             {
@@ -112,31 +104,8 @@ namespace Augurk.CommandLine.Entities
                 Description = scenario.Description,
                 Tags = scenario.Tags.ConvertToStrings(),
                 Steps = scenario.Steps.ConvertToSteps(dialect),
+                ExampleSets = scenario.Examples.ConvertToExampleSets(),
                 Location = scenario.Location.ConvertToSourceLocation()
-            };
-        }
-
-        /// <summary>
-        /// Converts the provided <see cref=" Gherkin.Ast.ScenarioOutline"/> instance into a <see cref="Augurk.Entities.Scenario"/> instance.
-        /// </summary>
-        /// <param name="scenarioOutline">The <see cref=" Gherkin.Ast.ScenarioOutline"/> instance that should be converted.</param>
-        /// <param name="dialect">The <see cref="GherkinDialect"/> that is being used for this feature.</param>
-        /// <returns>The converted <see cref="Augurk.Entities.Scenario"/> instance.</returns>
-        public static Scenario ConvertToScenario(this Gherkin.Ast.ScenarioOutline scenarioOutline, GherkinDialect dialect)
-        {
-            if (scenarioOutline == null)
-            {
-                throw new ArgumentNullException("scenarioOutline");
-            }
-
-            return new Scenario()
-            {
-                Title = scenarioOutline.Name,
-                Description = scenarioOutline.Description,
-                Tags = scenarioOutline.Tags.ConvertToStrings(),
-                Steps = scenarioOutline.Steps.ConvertToSteps(dialect),
-                ExampleSets = scenarioOutline.Examples.ConvertToExampleSets(),
-                Location = scenarioOutline.Location.ConvertToSourceLocation()
             };
         }
 

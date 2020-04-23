@@ -11,7 +11,17 @@
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/src/Augurk.CommandLine/bin/Debug/netcoreapp2.1/Augurk.dll",
-            "args": [],
+            "args": [
+                "publish",
+                "--featureFiles",
+                "../../test/test-data/commented-out-feature-file.feature",
+                "--productName",
+                "MyProduct",
+                "--groupName",
+                "MyGroup",
+                "--url",
+                "http://augurkdemo.azurewebsites.net/"
+            ],
             "cwd": "${workspaceFolder}/src/Augurk.CommandLine",
             // For more information about the 'console' field, see https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md#console-terminal-window
             "console": "internalConsole",

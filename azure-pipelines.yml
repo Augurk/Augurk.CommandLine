@@ -1,39 +1,36 @@
-# .NET Desktop
-# Build and run tests for .NET Desktop or Windows classic desktop solutions.
-# Add steps that publish symbols, save build artifacts, and more:
-# https://docs.microsoft.com/vsts/pipelines/apps/windows/dot-net
-
-variables:
-  solution: '**/*.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
+# Builds the Augurk CLI 
 
 jobs:
-- job: Windows
+- template: ci/build-job.yml
+  parameters:
+    vmImage: VS2017-Win2016
+    runtimeIdentifier: win-x64
+    jobName: Windows
+    archiveType: zip
+
+- template: ci/build-job.yml
+  parameters:
+    vmImage: macOS-10.15
+    runtimeIdentifier: osx-x64
+    jobName: macOS
+
+- template: ci/build-job.yml
+  parameters:
+    vmImage: ubuntu-16.04
+    runtimeIdentifier: linux-x64
+    jobName: Linux
+
+- job: NuGetPackages
   pool:
     vmImage: 'VS2017-Win2016'
   steps:
-    - task: GitVersion@4
-      displayName: 'Determine version'
-      inputs:
-        updateAssemblyInfo: true
-
     - script: dotnet --info
       displayName: 'dotnet --info'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet build'
+    - task: GitVersion@5
+      displayName: 'Determine version'
       inputs:
-        command: build
-        projects: 'src/Augurk.CommandLine/Augurk.CommandLine.csproj'
-        arguments: '-r win-x64 -c $(buildConfiguration)'
-
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet test'
-      inputs:
-        command: test
-        projects: 'src/Augurk.CommandLine.UnitTest/Augurk.CommandLine.UnitTest.csproj'
-        continueOnError: true
+        updateAssemblyInfo: true
 
     - task: DotNetCoreCLI@2
       displayName: 'dotnet pack'
@@ -42,144 +39,13 @@ jobs:
         projects: 'src/Augurk.CommandLine/Augurk.CommandLine.csproj'
         versioningScheme: byEnvVar
         versionEnvVar: GitVersion.NuGetVersionV2
-        configuration: $(buildConfiguration)
+        configuration: Release
         verbosityPack: Normal
         buildProperties: 'Version=$(GitVersion.MajorMinorPatch);InformationalVersion=$(GitVersion.InformationalVersion)'
-
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet publish'
-      inputs:
-        command: publish
-        projects: 'src/Augurk.CommandLine/Augurk.CommandLine.csproj'
-        arguments: '-r win-x64 -c $(buildConfiguration) /p:Version=$(GitVersion.MajorMinorPatch) /p:InformationalVersion=$(GitVersion.InformationalVersion)'
-        zipAfterPublish: false
-        publishWebProjects: false
 
     - task: PublishBuildArtifacts@1
       displayName: 'Publish NuGet package'
       inputs:
-        pathtoPublish: '$(Build.ArtifactStagingDirectory)/Augurk.CLI.$(GitVersion.NuGetVersionV2).nupkg'
+        pathtoPublish: '$(Build.ArtifactStagingDirectory)'
         artifactName: NuGetPackages
-        publishLocation: Container
-
-    - task: ArchiveFiles@2
-      displayName: 'Zip self-contained'
-      inputs:
-        rootFolderOrFile: '$(Build.SourcesDirectory)/src/Augurk.CommandLine/bin/$(buildConfiguration)/netcoreapp2.1/win-x64/publish/'
-        includeRootFolder: false
-        archiveType: zip
-        archiveFile: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine-win-x64-$(Build.BuildNumber).zip'
-
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish self-contained'
-      inputs:
-        pathToPublish: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine-win-x64-$(Build.BuildNumber).zip'
-        artifactName: Windows
-        publishLocation: Container
-
-    - powershell: |
-        echo "##vso[task.setvariable variable=GitVersion.MajorMinorPatch;isOutput=true]$(GitVersion.MajorMinorPatch)"
-        echo "##vso[task.setvariable variable=GitVersion.InformationalVersion;isOutput=true]$(GitVersion.InformationalVersion)"
-        echo "##vso[task.setvariable variable=Build.BuildNumber;isOutput=true]$(Build.BuildNumber)"
-      name: setOutputVariables
-      displayName: 'Set output variables (for subsequent phases)'
-
-- job: macOS
-  dependsOn: Windows # For now, since we can't run GitVersion on macOS
-  pool:
-    vmImage: macOS-10.13
-  variables:
-    GitVersion.MajorMinorPatch: $[dependencies.Windows.outputs['setOutputVariables.GitVersion.MajorMinorPatch']]
-    GitVersion.InformationalVersion: $[dependencies.Windows.outputs['setOutputVariables.GitVersion.InformationalVersion']]
-    Build.BuildNumber: $[dependencies.Windows.outputs['setOutputVariables.Build.BuildNumber']]
-  steps:
-    - script: dotnet --info
-      displayName: 'dotnet --info'
-
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet build'
-      inputs:
-        command: build
-        projects: 'src/Augurk.CommandLine/Augurk.CommandLine.csproj'
-        arguments: '-r osx-x64 -c $(buildConfiguration)'
-
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet test'
-      inputs:
-        command: test
-        projects: 'src/Augurk.CommandLine.UnitTest/Augurk.CommandLine.UnitTest.csproj'
-        continueOnError: true
-
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet publish'
-      inputs:
-        command: publish
-        projects: 'src/Augurk.CommandLine/Augurk.CommandLine.csproj'
-        arguments: '-r osx-x64 -c $(buildConfiguration) /p:Version=$(GitVersion.MajorMinorPatch) /p:InformationalVersion=$(GitVersion.InformationalVersion)'
-        zipAfterPublish: false
-        publishWebProjects: false
-
-    - task: ArchiveFiles@2
-      displayName: 'Tar self-contained'
-      inputs:
-        rootFolderOrFile: '$(Build.SourcesDirectory)/src/Augurk.CommandLine/bin/$(buildConfiguration)/netcoreapp2.1/osx-x64/publish/'
-        includeRootFolder: false
-        archiveType: tar
-        archiveFile: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine-osx-x64-$(Build.BuildNumber).tar.gz'
-
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish self-contained'
-      inputs:
-        pathToPublish: '$(Build.ArtifactStagingDirectory)'
-        artifactName: macOS
-        publishLocation: Container
-
-- job: Linux
-  dependsOn: Windows # For now, since we can't run GitVersion on macOS
-  pool:
-    vmImage: ubuntu-16.04
-  variables:
-    GitVersion.MajorMinorPatch: $[dependencies.Windows.outputs['setOutputVariables.GitVersion.MajorMinorPatch']]
-    GitVersion.InformationalVersion: $[dependencies.Windows.outputs['setOutputVariables.GitVersion.InformationalVersion']]
-    Build.BuildNumber: $[dependencies.Windows.outputs['setOutputVariables.Build.BuildNumber']]
-  steps:
-    - script: dotnet --info
-      displayName: 'dotnet --info'
-
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet build'
-      inputs:
-        command: build
-        projects: 'src/Augurk.CommandLine/Augurk.CommandLine.csproj'
-        arguments: '-r linux-x64 -c $(buildConfiguration)'
-
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet test'
-      inputs:
-        command: test
-        projects: 'src/Augurk.CommandLine.UnitTest/Augurk.CommandLine.UnitTest.csproj'
-        continueOnError: true
-
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet publish'
-      inputs:
-        command: publish
-        projects: 'src/Augurk.CommandLine/Augurk.CommandLine.csproj'
-        arguments: '-r linux-x64 -c $(buildConfiguration) /p:Version=$(GitVersion.MajorMinorPatch) /p:InformationalVersion=$(GitVersion.InformationalVersion)'
-        zipAfterPublish: false
-        publishWebProjects: false
-
-    - task: ArchiveFiles@2
-      displayName: 'Tar self-contained'
-      inputs:
-        rootFolderOrFile: '$(Build.SourcesDirectory)/src/Augurk.CommandLine/bin/$(buildConfiguration)/netcoreapp2.1/linux-x64/publish/'
-        includeRootFolder: false
-        archiveType: tar
-        archiveFile: '$(Build.ArtifactStagingDirectory)/Augurk.CommandLine-linux-x64-$(Build.BuildNumber).tar.gz'
-
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish self-contained'
-      inputs:
-        pathToPublish: '$(Build.ArtifactStagingDirectory)'
-        artifactName: Linux
         publishLocation: Container
